@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+:root {
+  --color-ink: #0f1a2b;
+  --color-ink-soft: #16233a;
+  --color-paper: #f7f5ef;
+  --color-paper-dim: #ece8dd;
+  --color-gold: #b8912f;
+  --color-gold-bright: #d4af37;
+  --color-slate: #5b6472;
+  --color-gain: #1f7a5c;
+  --color-loss: #b23a2f;
+  --color-line: #e3ddce;
+}
+
+@theme inline {
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-paper: var(--color-paper);
+  --color-paper-dim: var(--color-paper-dim);
+  --color-gold: var(--color-gold);
+  --color-gold-bright: var(--color-gold-bright);
+  --color-slate: var(--color-slate);
+  --color-gain: var(--color-gain);
+  --color-loss: var(--color-loss);
+  --color-line: var(--color-line);
+
+  --font-display: Georgia, "Times New Roman", "Noto Naskh Arabic", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Arabic", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+::selection {
+  background: var(--color-gold-bright);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+[dir="rtl"] .ltr-flip {
+  transform: scaleX(-1);
+}
