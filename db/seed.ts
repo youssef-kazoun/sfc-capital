@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { db, schema } from "../db";
 import bcrypt from "bcryptjs";
 
