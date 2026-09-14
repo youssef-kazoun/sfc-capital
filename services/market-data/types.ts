@@ -17,7 +17,7 @@ export interface Candle {
 
 /**
  * Abstraction over any market-data source. Swap MockProvider for a
- * RealProvider (e.g. an EGX/Refinitiv/IEX feed) by changing getMarketDataProvider()
+ * RealProvider (e.g. a Tadawul/Nasdaq/Refinitiv feed) by changing getMarketDataProvider()
  * below — no other code in the app needs to change.
  */
 export interface MarketDataProvider {

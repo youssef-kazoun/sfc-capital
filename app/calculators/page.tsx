@@ -71,7 +71,7 @@ function PositionSizeCalculator() {
     <Card>
       <h3 className="font-display text-lg text-ink mb-4">حجم الصفقة</h3>
       <div className="grid grid-cols-2 gap-3">
-        <Field label="رأس المال (جنيه)" value={capital} onChange={(e) => setCapital(+e.target.value)} />
+        <Field label="رأس المال ($)" value={capital} onChange={(e) => setCapital(+e.target.value)} />
         <Field label="المخاطرة لكل صفقة (%)" value={riskPct} onChange={(e) => setRiskPct(+e.target.value)} />
         <Field label="سعر الدخول" value={entry} onChange={(e) => setEntry(+e.target.value)} />
         <Field label="سعر وقف الخسارة" value={stop} onChange={(e) => setStop(+e.target.value)} />
@@ -93,7 +93,7 @@ function CompoundGrowthCalculator() {
     <Card>
       <h3 className="font-display text-lg text-ink mb-4">النمو المركب</h3>
       <div className="grid grid-cols-3 gap-3">
-        <Field label="رأس المال الأساسي (جنيه)" value={principal} onChange={(e) => setPrincipal(+e.target.value)} />
+        <Field label="رأس المال الأساسي ($)" value={principal} onChange={(e) => setPrincipal(+e.target.value)} />
         <Field label="العائد السنوي (%)" value={rate} onChange={(e) => setRate(+e.target.value)} />
         <Field label="عدد السنوات" value={years} onChange={(e) => setYears(+e.target.value)} />
       </div>

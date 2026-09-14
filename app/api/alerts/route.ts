@@ -17,6 +17,7 @@ export async function GET() {
       symbol: schema.stocks.symbol,
       name: schema.stocks.name,
       lastPrice: schema.stocks.lastPrice,
+      currency: schema.stocks.currency,
     })
     .from(schema.alerts)
     .leftJoin(schema.stocks, eq(schema.alerts.stockId, schema.stocks.id))

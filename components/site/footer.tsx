@@ -7,8 +7,8 @@ export default function Footer() {
         <div>
           <div className="font-display text-lg text-paper mb-3">SFC Capital</div>
           <p className="text-sm leading-relaxed text-paper/60">
-            بيانات السوق، البحث، وأدوات إدارة المحفظة للمستثمرين في البورصة
-            المصرية.
+            بيانات السوق، البحث، وأدوات إدارة المحفظة للمستثمرين في السوق
+            السعودي والأسواق الأمريكية.
           </p>
         </div>
         <div>

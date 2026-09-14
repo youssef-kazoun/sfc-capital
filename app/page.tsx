@@ -23,11 +23,11 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-4 py-20 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="font-display text-4xl sm:text-5xl leading-tight text-paper">
-              استثمر بثقة في السوق المصري
+              استثمر بثقة في الأسواق السعودية والأمريكية
             </h1>
             <p className="mt-5 text-paper/70 text-lg leading-relaxed max-w-md">
-              أسعار لحظية، توصيات من محللين، وأدوات لإدارة المحفظة — كل ذلك
-              في منصة واحدة للبورصة المصرية.
+              أسعار لحظية، توصيات من محللين، وأدوات لإدارة المحفظة — لأسواق
+              تداول السعودية (تاسي) والأسواق الأمريكية، في منصة واحدة.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/register">
@@ -60,9 +60,9 @@ export default async function HomePage() {
       {/* Value props */}
       <section className="mx-auto max-w-6xl px-4 py-16 grid sm:grid-cols-3 gap-8">
         {[
-          { icon: LineChart, title: "بيانات السوق اللحظية", body: "أسعار ورسوم بيانية لكل الأسهم المسجلة في البورصة، تتحدث بشكل مستمر." },
+          { icon: LineChart, title: "بيانات السوق اللحظية", body: "أسعار ورسوم بيانية لأسهم السوق السعودي والأسواق الأمريكية، تتحدث بشكل مستمر." },
           { icon: ShieldCheck, title: "توصيات المحللين", body: "مستويات الدخول، الهدف، ووقف الخسارة، مع الأسباب وراء كل توصية." },
-          { icon: Newspaper, title: "أخبار السوق المنتقاة", body: "الأخبار التي تؤثر فعليًا على الأسهم المصرية، بدون ضوضاء." },
+          { icon: Newspaper, title: "أخبار السوق المنتقاة", body: "الأخبار التي تؤثر فعليًا على أسهم تاسي والأسواق الأمريكية، بدون ضوضاء." },
         ].map((f) => (
           <div key={f.title}>
             <f.icon className="h-6 w-6 text-gold" strokeWidth={1.75} />

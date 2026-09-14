@@ -27,7 +27,7 @@ export default async function PackagesPage() {
               <h3 className="font-display text-xl text-ink mt-2">{pkg.nameAr || pkg.name}</h3>
               <p className="text-sm text-slate mt-1">{pkg.description}</p>
               <div className="mt-4 font-display text-3xl text-ink">
-                {isFree ? "مجانًا" : `${pkg.priceMonthly} جنيه`}
+                {isFree ? "مجانًا" : `$${pkg.priceMonthly}`}
                 {!isFree && <span className="text-sm text-slate font-sans">/شهريًا</span>}
               </div>
               <ul className="mt-6 space-y-2 flex-1">

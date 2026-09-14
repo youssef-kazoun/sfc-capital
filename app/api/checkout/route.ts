@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     const provider = getPaymentProvider();
     const charge = await provider.charge({
       amount,
-      currency: "EGP",
+      currency: "USD",
       description: `${pkg.name} subscription (${billingCycle})`,
     });
 
