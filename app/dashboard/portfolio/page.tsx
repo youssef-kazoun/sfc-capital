@@ -80,8 +80,8 @@ export default function PortfolioPage() {
 
       {rows.length > 0 && (
         <div className="grid sm:grid-cols-3 gap-4 mb-6">
-          <Card><div className="text-xs text-slate">القيمة الإجمالية</div><div className="font-display text-xl mt-1">{formatCurrency(totalValue, rows[0]?.currency || "EGP")}</div></Card>
-          <Card><div className="text-xs text-slate">التكلفة الإجمالية</div><div className="font-display text-xl mt-1">{formatCurrency(totalCost, rows[0]?.currency || "EGP")}</div></Card>
+          <Card><div className="text-xs text-slate">القيمة الإجمالية</div><div className="font-display text-xl mt-1">{formatCurrency(totalValue, rows[0]?.currency || "USD")}</div></Card>
+          <Card><div className="text-xs text-slate">التكلفة الإجمالية</div><div className="font-display text-xl mt-1">{formatCurrency(totalCost, rows[0]?.currency || "USD")}</div></Card>
           <Card><div className="text-xs text-slate">الربح/الخسارة غير المحققة</div><div className={`font-display text-xl mt-1 ${totalPnlPct >= 0 ? "text-gain" : "text-loss"}`}>{formatPct(totalPnlPct)}</div></Card>
         </div>
       )}

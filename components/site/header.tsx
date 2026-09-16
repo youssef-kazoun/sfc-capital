@@ -74,7 +74,7 @@ export default function Header() {
             )}
           </div>
 
-          <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
+          <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="القائمة">
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>

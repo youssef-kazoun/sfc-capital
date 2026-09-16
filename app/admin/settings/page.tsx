@@ -1,13 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Input, Card } from "@/components/ui/primitives";
+import { Button, Input, Select, Card } from "@/components/ui/primitives";
 
-const KNOWN_KEYS = [
-  { key: "site_name", label: "اسم الموقع", placeholder: "SFC Capital" },
-  { key: "support_email", label: "بريد الدعم الفني", placeholder: "support@sfccapital.com" },
-  { key: "support_phone", label: "هاتف الدعم الفني", placeholder: "+20 100 000 0000" },
-  { key: "maintenance_mode", label: "وضع الصيانة (true/false)", placeholder: "false" },
+const KNOWN_KEYS: {
+  key: string;
+  label: string;
+  placeholder?: string;
+  arabicLabel?: string;
+  type?: "text" | "boolean";
+}[] = [
+  { key: "site_name", label: "اسم الموقع", arabicLabel: "اسم الموقع", placeholder: "SFC Capital", type: "text" },
+  { key: "support_email", label: "بريد الدعم الفني", arabicLabel: "بريد الدعم الفني", placeholder: "support@sfccapital.com", type: "text" },
+  { key: "support_phone", label: "هاتف الدعم الفني", arabicLabel: "هاتف الدعم الفني", placeholder: "+966 50 000 0000", type: "text" },
+  { key: "maintenance_mode", label: "وضع الصيانة", arabicLabel: "وضع الصيانة", type: "boolean" },
 ];
 
 export default function AdminSettingsPage() {
@@ -24,14 +30,14 @@ export default function AdminSettingsPage() {
       });
   }, []);
 
-  async function saveKey(key: string) {
+  async function saveKey(key: string, arabicLabel: string) {
     setStatus(null);
     await fetch("/api/admin/settings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ key, value: values[key] || "" }),
     });
-    setStatus(`تم حفظ ${key}`);
+    setStatus(`تم حفظ ${arabicLabel}`);
   }
 
   return (
@@ -42,13 +48,25 @@ export default function AdminSettingsPage() {
           <div key={k.key} className="flex items-end gap-2">
             <div className="flex-1">
               <label className="text-xs text-slate">{k.label}</label>
-              <Input
-                placeholder={k.placeholder}
-                value={values[k.key] || ""}
-                onChange={(e) => setValues({ ...values, [k.key]: e.target.value })}
-              />
+              {k.type === "boolean" ? (
+                <Select
+                  value={values[k.key] || "false"}
+                  onChange={(e) => setValues({ ...values, [k.key]: e.target.value })}
+                >
+                  <option value="false">مُعطّل</option>
+                  <option value="true">مُفعّل</option>
+                </Select>
+              ) : (
+                <Input
+                  placeholder={k.placeholder}
+                  value={values[k.key] || ""}
+                  onChange={(e) => setValues({ ...values, [k.key]: e.target.value })}
+                />
+              )}
             </div>
-            <Button variant="secondary" onClick={() => saveKey(k.key)}>حفظ</Button>
+            <Button variant="secondary" onClick={() => saveKey(k.key, k.arabicLabel || k.label)}>
+              حفظ
+            </Button>
           </div>
         ))}
         {status && <p className="text-sm text-gain">{status}</p>}

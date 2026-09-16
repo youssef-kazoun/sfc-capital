@@ -11,13 +11,13 @@ export class ApiAuthError extends Error {
 
 export async function requireApiUser() {
   const session = await auth();
-  if (!session?.user) throw new ApiAuthError(401, "Unauthorized");
+  if (!session?.user) throw new ApiAuthError(401, "غير مصرح بالدخول");
   return session.user;
 }
 
 export async function requireApiRole(roles: string[]) {
   const user = await requireApiUser();
-  if (!roles.includes(user.role)) throw new ApiAuthError(403, "Forbidden");
+  if (!roles.includes(user.role)) throw new ApiAuthError(403, "ليس لديك صلاحية");
   return user;
 }
 
@@ -26,5 +26,5 @@ export function apiErrorResponse(err: unknown) {
     return NextResponse.json({ error: err.message }, { status: err.status });
   }
   console.error(err);
-  return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  return NextResponse.json({ error: "حدث خطأ في الخادم" }, { status: 500 });
 }

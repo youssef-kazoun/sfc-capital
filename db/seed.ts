@@ -3,473 +3,312 @@ import { db, schema } from "../db";
 import bcrypt from "bcryptjs";
 
 async function main() {
-  console.log("Seeding SFC Capital - Saudi + US markets...");
+  console.log("Seeding database...");
 
+  // ---------------- Users ----------------
   const passwordHash = await bcrypt.hash("Password123!", 10);
 
-  // =========================
-  // USERS
-  // =========================
-  const [admin, analyst, customer] = await db
+  const [admin] = await db
     .insert(schema.users)
-    .values([
-      {
-        email: "admin@sfccapital.com",
-        name: "SFC Capital Admin",
-        role: "ADMIN",
-        passwordHash,
-      },
-      {
-        email: "analyst@sfccapital.com",
-        name: "SFC Market Analyst",
-        role: "ANALYST",
-        passwordHash,
-      },
-      {
-        email: "customer@sfccapital.com",
-        name: "SFC Customer",
-        role: "CUSTOMER",
-        passwordHash,
-      },
-    ])
+    .values({
+      name: "مدير النظام",
+      email: "admin@sfccapital.com",
+      passwordHash,
+      role: "ADMIN",
+    })
     .returning();
 
-  // =========================
-  // STOCKS
-  // Demo/sample prices only.
-  // =========================
-  const stocks = await db
-    .insert(schema.stocks)
-    .values([
-      {
-        symbol: "2222",
-        name: "Saudi Aramco",
-        exchange: "TADAWUL",
-        sector: "Energy",
-        currency: "SAR",
-        lastPrice: 27.8,
-        changePct: 1.25,
-        volume: 18500000,
-        marketCap: 6850000000000,
-      },
-      {
-        symbol: "1120",
-        name: "Al Rajhi Bank",
-        exchange: "TADAWUL",
-        sector: "Banking",
-        currency: "SAR",
-        lastPrice: 95.5,
-        changePct: 0.82,
-        volume: 6200000,
-        marketCap: 382000000000,
-      },
-      {
-        symbol: "2010",
-        name: "SABIC",
-        exchange: "TADAWUL",
-        sector: "Materials",
-        currency: "SAR",
-        lastPrice: 62.0,
-        changePct: -0.35,
-        volume: 4100000,
-        marketCap: 186000000000,
-      },
-      {
-        symbol: "7010",
-        name: "stc",
-        exchange: "TADAWUL",
-        sector: "Telecommunications",
-        currency: "SAR",
-        lastPrice: 42.5,
-        changePct: 0.48,
-        volume: 2800000,
-        marketCap: 213000000000,
-      },
-      {
-        symbol: "1150",
-        name: "Alinma Bank",
-        exchange: "TADAWUL",
-        sector: "Banking",
-        currency: "SAR",
-        lastPrice: 31.2,
-        changePct: 1.05,
-        volume: 5300000,
-        marketCap: 62200000000,
-      },
-      {
-        symbol: "1180",
-        name: "Saudi National Bank",
-        exchange: "TADAWUL",
-        sector: "Banking",
-        currency: "SAR",
-        lastPrice: 35.8,
-        changePct: -0.22,
-        volume: 3600000,
-        marketCap: 214000000000,
-      },
-      {
-        symbol: "AAPL",
-        name: "Apple",
-        exchange: "NASDAQ",
-        sector: "Technology",
-        currency: "USD",
-        lastPrice: 230,
-        changePct: 0.76,
-        volume: 42000000,
-        marketCap: 3500000000000,
-      },
-      {
-        symbol: "MSFT",
-        name: "Microsoft",
-        exchange: "NASDAQ",
-        sector: "Technology",
-        currency: "USD",
-        lastPrice: 500,
-        changePct: 0.42,
-        volume: 21000000,
-        marketCap: 3700000000000,
-      },
-      {
-        symbol: "NVDA",
-        name: "NVIDIA",
-        exchange: "NASDAQ",
-        sector: "Semiconductors",
-        currency: "USD",
-        lastPrice: 180,
-        changePct: 1.84,
-        volume: 51000000,
-        marketCap: 4400000000000,
-      },
-      {
-        symbol: "AMZN",
-        name: "Amazon",
-        exchange: "NASDAQ",
-        sector: "Consumer & Technology",
-        currency: "USD",
-        lastPrice: 230,
-        changePct: 0.91,
-        volume: 26000000,
-        marketCap: 2450000000000,
-      },
-      {
-        symbol: "GOOGL",
-        name: "Alphabet",
-        exchange: "NASDAQ",
-        sector: "Technology",
-        currency: "USD",
-        lastPrice: 250,
-        changePct: 0.58,
-        volume: 19000000,
-        marketCap: 3050000000000,
-      },
-      {
-        symbol: "TSLA",
-        name: "Tesla",
-        exchange: "NASDAQ",
-        sector: "Automotive & Technology",
-        currency: "USD",
-        lastPrice: 350,
-        changePct: -0.64,
-        volume: 39000000,
-        marketCap: 1120000000000,
-      },
-    ])
+  const [analyst] = await db
+    .insert(schema.users)
+    .values({
+      name: "نور السيد",
+      email: "analyst@sfccapital.com",
+      passwordHash,
+      role: "ANALYST",
+    })
     .returning();
 
-  // =========================
-  // PRICE HISTORY
-  // Synthetic demo history.
-  // =========================
-  const history = [];
+  const [customer] = await db
+    .insert(schema.users)
+    .values({
+      name: "عميل تجريبي",
+      email: "customer@sfccapital.com",
+      passwordHash,
+      role: "CUSTOMER",
+    })
+    .returning();
 
+  // ---------------- Stocks: Saudi (Tadawul) + US (NASDAQ/NYSE) ----------------
+  const stockSeed = [
+    // Saudi market — Tadawul, priced in SAR
+    { symbol: "2222", name: "أرامكو السعودية", exchange: "TADAWUL", sector: "الطاقة", currency: "SAR", lastPrice: 29.8, changePct: 0.6, volume: 12500000, marketCap: 7200000000000 },
+    { symbol: "1120", name: "مصرف الراجحي", exchange: "TADAWUL", sector: "بنوك", currency: "SAR", lastPrice: 86.4, changePct: 1.4, volume: 3100000, marketCap: 216000000000 },
+    { symbol: "2010", name: "سابك", exchange: "TADAWUL", sector: "صناعات كيماوية", currency: "SAR", lastPrice: 64.2, changePct: -0.5, volume: 1800000, marketCap: 192000000000 },
+    { symbol: "7010", name: "الاتصالات السعودية STC", exchange: "TADAWUL", sector: "اتصالات", currency: "SAR", lastPrice: 41.5, changePct: 0.9, volume: 2200000, marketCap: 166000000000 },
+    { symbol: "1211", name: "معادن", exchange: "TADAWUL", sector: "تعدين", currency: "SAR", lastPrice: 56.7, changePct: 2.1, volume: 2600000, marketCap: 113000000000 },
+    { symbol: "2280", name: "المراعي", exchange: "TADAWUL", sector: "سلع استهلاكية", currency: "SAR", lastPrice: 48.3, changePct: -0.3, volume: 700000, marketCap: 45000000000 },
+    // US market — NASDAQ/NYSE, priced in USD
+    { symbol: "AAPL", name: "آبل", exchange: "NASDAQ", sector: "تكنولوجيا", currency: "USD", lastPrice: 194.5, changePct: 0.8, volume: 48000000, marketCap: 3000000000000 },
+    { symbol: "MSFT", name: "مايكروسوفت", exchange: "NASDAQ", sector: "تكنولوجيا", currency: "USD", lastPrice: 421.3, changePct: 1.1, volume: 21000000, marketCap: 3100000000000 },
+    { symbol: "NVDA", name: "إنفيديا", exchange: "NASDAQ", sector: "أشباه الموصلات", currency: "USD", lastPrice: 878.2, changePct: 3.4, volume: 39000000, marketCap: 2160000000000 },
+    { symbol: "AMZN", name: "أمازون", exchange: "NASDAQ", sector: "تجزئة", currency: "USD", lastPrice: 178.9, changePct: -0.6, volume: 33000000, marketCap: 1860000000000 },
+    { symbol: "TSLA", name: "تسلا", exchange: "NASDAQ", sector: "سيارات", currency: "USD", lastPrice: 244.8, changePct: -1.8, volume: 71000000, marketCap: 780000000000 },
+    { symbol: "JPM", name: "جي بي مورجان تشيس", exchange: "NYSE", sector: "بنوك", currency: "USD", lastPrice: 204.6, changePct: 0.5, volume: 8200000, marketCap: 590000000000 },
+  ];
+
+  const stocks = await db.insert(schema.stocks).values(stockSeed).returning();
+  const bySymbol = Object.fromEntries(stocks.map((s) => [s.symbol, s]));
+
+  // ---------------- Price history (90 days synthetic walk) ----------------
   for (const stock of stocks) {
-    let price = Number(stock.lastPrice);
-
+    let price = stock.lastPrice * 0.8;
+    const rows = [];
+    const today = new Date();
     for (let i = 90; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-
-      const change = (Math.random() - 0.5) * 0.035;
-      price = Math.max(price * (1 + change), 0.01);
-
-      history.push({
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const changePct = (Math.random() - 0.47) * 3;
+      const open = price;
+      price = Math.max(0.5, price * (1 + changePct / 100));
+      const close = i === 0 ? stock.lastPrice : price;
+      const high = Math.max(open, close) * 1.01;
+      const low = Math.min(open, close) * 0.99;
+      rows.push({
         stockId: stock.id,
-        date: date.toISOString().slice(0, 10),
-        open: Number((price * (1 - Math.random() * 0.01)).toFixed(2)),
-        high: Number((price * (1 + Math.random() * 0.015)).toFixed(2)),
-        low: Number((price * (1 - Math.random() * 0.015)).toFixed(2)),
-        close: Number(price.toFixed(2)),
-        volume: Math.floor(Number(stock.volume) * (0.6 + Math.random() * 0.8)),
+        date: d.toISOString().slice(0, 10),
+        open: Number(open.toFixed(2)),
+        high: Number(high.toFixed(2)),
+        low: Number(low.toFixed(2)),
+        close: Number(close.toFixed(2)),
+        volume: Math.floor(200000 + Math.random() * 2000000),
+      });
+    }
+    await db.insert(schema.priceHistory).values(rows);
+  }
+
+  // ---------------- News ----------------
+  const newsSeed = [
+    {
+      slug: "fed-holds-interest-rates-steady",
+      title: "الاحتياطي الفيدرالي الأمريكي يبقي على أسعار الفائدة دون تغيير",
+      excerpt:
+        "لجنة السوق المفتوحة الفيدرالية أبقت على سعر الفائدة القياسي دون تغيير، مشيرة إلى ضرورة مزيد من الأدلة على تراجع التضخم.",
+      content:
+        "قرر الاحتياطي الفيدرالي الأمريكي الإبقاء على سعر الفائدة القياسي دون تغيير في اجتماعه الأخير، في خطوة كانت متوقعة على نطاق واسع من الأسواق. وأشار رئيس الاحتياطي الفيدرالي إلى أن اللجنة تحتاج إلى مزيد من الثقة في استمرار تراجع التضخم نحو المستوى المستهدف قبل الشروع في خفض أسعار الفائدة، مما أبقى الأسواق في حالة ترقب لمسار السياسة النقدية خلال الأشهر المقبلة.",
+      category: "الاقتصاد الكلي",
+      authorId: analyst.id,
+      published: true,
+      publishedAt: new Date().toISOString(),
+    },
+    {
+      slug: "aramco-reports-strong-quarterly-results",
+      title: "أرامكو السعودية تعلن نتائج فصلية قوية",
+      excerpt:
+        "أرامكو السعودية حققت نتائج تفوق توقعات المحللين مدعومة باستقرار أسعار النفط وكفاءة التشغيل.",
+      content:
+        "أعلنت أرامكو السعودية عن نتائج مالية فصلية تجاوزت توقعات المحللين، مدعومة باستقرار أسعار النفط العالمية وتحسن كفاءة التشغيل عبر مختلف قطاعات الشركة. وأكدت الشركة التزامها بخطط التوزيعات للمساهمين، مشيرة إلى استمرار الاستثمار في مشاريع التوسع بقطاعي التكرير والكيماويات.",
+      category: "الأرباح",
+      authorId: analyst.id,
+      published: true,
+      publishedAt: new Date(Date.now() - 86400000).toISOString(),
+      stockSymbol: "2222",
+    },
+    {
+      slug: "apple-expands-digital-services",
+      title: "آبل تعلن عن توسع في خدماتها الرقمية",
+      excerpt:
+        "آبل كشفت عن خطط لتوسيع قطاع الخدمات الرقمية بعد نمو قوي في الإيرادات المتكررة.",
+      content:
+        "كشفت آبل عن خطط لتوسيع نطاق خدماتها الرقمية بعد أن سجل هذا القطاع نموًا قويًا في الإيرادات المتكررة خلال الأرباع الأخيرة. وقال مسؤولو الشركة إن التركيز المتزايد على الخدمات يأتي في إطار استراتيجية لتنويع مصادر الإيرادات بعيدًا عن مبيعات الأجهزة التقليدية.",
+      category: "الشركات",
+      authorId: analyst.id,
+      published: true,
+      publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+      stockSymbol: "AAPL",
+    },
+    {
+      slug: "tasi-closes-higher-banking-rally",
+      title: "مؤشر تاسي يغلق مرتفعًا بدعم من قطاع البنوك",
+      excerpt:
+        "المؤشر العام للسوق السعودي ارتفع مع تصدّر الأسهم البنكية المكاسب وسط تحسن شهية المستثمرين.",
+      content:
+        "أغلق المؤشر العام للسوق السعودي (تاسي) مرتفعًا في جلسة تداول حديثة، بقيادة مكاسب في قطاع البنوك ومن أبرزها مصرف الراجحي. وأشار المتداولون إلى تحسن المعنويات حول أرباح القطاع المصرفي مع استمرار الطلب على التمويل واستقرار جودة الأصول.",
+      category: "الأسواق",
+      authorId: analyst.id,
+      published: true,
+      publishedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+      stockSymbol: "1120",
+    },
+  ];
+
+  for (const n of newsSeed) {
+    const { stockSymbol, ...rest } = n as any;
+    const [article] = await db.insert(schema.newsArticles).values(rest).returning();
+    if (stockSymbol && bySymbol[stockSymbol]) {
+      await db.insert(schema.newsArticleStocks).values({
+        newsId: article.id,
+        stockId: bySymbol[stockSymbol].id,
       });
     }
   }
 
-  await db.insert(schema.priceHistory).values(history);
-
-  // =========================
-  // NEWS
-  // =========================
-  const news = await db
-    .insert(schema.newsArticles)
-    .values([
-      {
-        slug: "saudi-market-outlook",
-        title: "Saudi Market Outlook: Key Trends to Watch",
-        excerpt:
-          "An overview of major trends across the Saudi market and key sectors.",
-        content:
-          "Saudi equities continue to attract attention as investors monitor energy, banking, telecommunications and broader economic developments.",
-        category: "MARKETS",
-        published: true,
-        publishedAt: new Date().toISOString(),
-        authorId: analyst.id,
-      },
-      {
-        slug: "aramco-energy-market-update",
-        title: "Saudi Energy Market Update",
-        excerpt:
-          "Key developments affecting the Saudi energy sector and major energy companies.",
-        content:
-          "Investors are closely watching energy demand, production expectations and global commodity-market developments.",
-        category: "ENERGY",
-        published: true,
-        publishedAt: new Date(Date.now() - 86400000).toISOString(),
-        authorId: analyst.id,
-      },
-      {
-        slug: "us-tech-sector-outlook",
-        title: "US Technology Sector Outlook",
-        excerpt:
-          "Technology remains one of the most closely watched areas of the US equity market.",
-        content:
-          "Investors continue to focus on cloud computing, artificial intelligence, software growth and technology-sector earnings.",
-        category: "TECHNOLOGY",
-        published: true,
-        publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-        authorId: analyst.id,
-      },
-      {
-        slug: "ai-semiconductor-market-trends",
-        title: "AI and Semiconductor Market Trends",
-        excerpt:
-          "Artificial intelligence infrastructure continues to drive semiconductor demand.",
-        content:
-          "AI infrastructure, accelerated computing and data-center investment remain major themes for semiconductor investors.",
-        category: "AI",
-        published: true,
-        publishedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-        authorId: analyst.id,
-      },
-    ])
-    .returning();
-
-  const stockBySymbol = Object.fromEntries(
-    stocks.map((stock) => [stock.symbol, stock])
-  );
-
-  await db.insert(schema.newsArticleStocks).values([
+  // ---------------- Recommendations ----------------
+  const recSeed = [
     {
-      newsId: news[0].id,
-      stockId: stockBySymbol["2222"].id,
-    },
-    {
-      newsId: news[0].id,
-      stockId: stockBySymbol["1120"].id,
-    },
-    {
-      newsId: news[1].id,
-      stockId: stockBySymbol["2222"].id,
-    },
-    {
-      newsId: news[2].id,
-      stockId: stockBySymbol["AAPL"].id,
-    },
-    {
-      newsId: news[2].id,
-      stockId: stockBySymbol["MSFT"].id,
-    },
-    {
-      newsId: news[2].id,
-      stockId: stockBySymbol["GOOGL"].id,
-    },
-    {
-      newsId: news[3].id,
-      stockId: stockBySymbol["NVDA"].id,
-    },
-  ]);
-
-  // =========================
-  // RECOMMENDATIONS
-  // =========================
-  await db.insert(schema.recommendations).values([
-    {
-      stockId: stockBySymbol["2222"].id,
-      action: "BUY",
-      targetPrice: 31.0,
-      entryPrice: 27.8,
-      stopLoss: 25.5,
+      symbol: "2222",
+      action: "BUY" as const,
+      entryPrice: 29.0,
+      targetPrice: 34.0,
+      stopLoss: 26.5,
       rationale:
-        "Long-term energy demand and the company's strategic position support a positive outlook.",
-      riskLevel: "MEDIUM",
-      timeHorizon: "6-12 months",
-      authorId: analyst.id,
+        "استقرار أسعار النفط وانضباط الإنفاق الرأسمالي يدعمان استمرار التوزيعات المرتفعة وإعادة تقييم تدريجية للسهم.",
+      riskLevel: "Low",
+      timeHorizon: "١٢ شهرًا",
     },
     {
-      stockId: stockBySymbol["1120"].id,
-      action: "ACCUMULATE",
-      targetPrice: 108.0,
-      entryPrice: 95.5,
-      stopLoss: 88,
+      symbol: "NVDA",
+      action: "ACCUMULATE" as const,
+      entryPrice: 850.0,
+      targetPrice: 1050.0,
+      stopLoss: 720.0,
       rationale:
-        "Strong banking fundamentals and growth opportunities support gradual accumulation.",
-      riskLevel: "MEDIUM",
-      timeHorizon: "6-12 months",
-      authorId: analyst.id,
+        "استمرار الطلب القوي على رقائق الذكاء الاصطناعي وتوسع هامش الربح يدعمان نموًا إضافيًا في الإيرادات.",
+      riskLevel: "High",
+      timeHorizon: "٦-١٢ شهرًا",
     },
     {
-      stockId: stockBySymbol["NVDA"].id,
-      action: "BUY",
-      targetPrice: 215.0,
-      entryPrice: 180,
-      stopLoss: 160,
+      symbol: "1120",
+      action: "BUY" as const,
+      entryPrice: 84.0,
+      targetPrice: 96.0,
+      stopLoss: 76.0,
       rationale:
-        "AI infrastructure demand remains a major growth driver for accelerated computing.",
-      riskLevel: "HIGH",
-      timeHorizon: "6-12 months",
-      authorId: analyst.id,
+        "نمو محفظة التمويل وتحسن جودة الأصول يدعمان استمرار نمو الأرباح في القطاع المصرفي السعودي.",
+      riskLevel: "Medium",
+      timeHorizon: "٦-١٢ شهرًا",
     },
     {
-      stockId: stockBySymbol["AAPL"].id,
-      action: "HOLD",
-      targetPrice: 245.0,
-      entryPrice: 230,
-      stopLoss: 210,
+      symbol: "AMZN",
+      action: "HOLD" as const,
+      entryPrice: 178.0,
+      targetPrice: 195.0,
+      stopLoss: 160.0,
       rationale:
-        "Strong ecosystem and cash generation are balanced by valuation considerations.",
-      riskLevel: "MEDIUM",
-      timeHorizon: "6-12 months",
-      authorId: analyst.id,
+        "أداء قوي في قطاع الحوسبة السحابية يقابله ضغط على هوامش قطاع التجزئة؛ ننتظر وضوحًا أكبر قبل زيادة الوزن النسبي.",
+      riskLevel: "Medium",
+      timeHorizon: "٣ أشهر",
     },
     {
-      stockId: stockBySymbol["AMZN"].id,
-      action: "ACCUMULATE",
-      targetPrice: 265.0,
-      entryPrice: 230,
-      stopLoss: 210,
+      symbol: "TSLA",
+      action: "REDUCE" as const,
+      entryPrice: 250.0,
+      targetPrice: 210.0,
+      stopLoss: 265.0,
       rationale:
-        "Cloud computing and e-commerce growth provide multiple long-term growth drivers.",
-      riskLevel: "MEDIUM",
-      timeHorizon: "6-12 months",
-      authorId: analyst.id,
+        "تباطؤ نمو التسليمات وضغوط تنافسية متزايدة في قطاع السيارات الكهربائية يستدعيان تقليل حجم المركز.",
+      riskLevel: "High",
+      timeHorizon: "٣ أشهر",
     },
-  ]);
+  ];
 
-  // =========================
-  // ANALYSES
-  // =========================
+  for (const r of recSeed) {
+    const stock = bySymbol[r.symbol];
+    await db.insert(schema.recommendations).values({
+      stockId: stock.id,
+      action: r.action,
+      entryPrice: r.entryPrice,
+      targetPrice: r.targetPrice,
+      stopLoss: r.stopLoss,
+      rationale: r.rationale,
+      riskLevel: r.riskLevel,
+      timeHorizon: r.timeHorizon,
+      authorId: analyst.id,
+      status: "OPEN",
+    });
+  }
+
+  // ---------------- Analysis ----------------
   await db.insert(schema.analyses).values([
     {
-      slug: "tadawul-market-outlook",
-      title: "Tadawul Market Outlook",
-      summary:
-        "A broad review of Saudi market sectors, opportunities and key risks.",
+      slug: "nasdaq-technical-outlook-q3",
+      title: "التوقعات الفنية لمؤشر ناسداك: النطاق الحالي والمستويات الرئيسية",
+      type: "فني",
+      summary: "المؤشر يتماسك بين نطاقي دعم ومقاومة رئيسيين قبل موسم أرباح قطاع التكنولوجيا.",
       content:
-        "The Saudi market presents opportunities across energy, banking, telecommunications and industrial sectors. Investors should monitor macroeconomic conditions, earnings and global market sentiment.",
-      stockId: stockBySymbol["2222"].id,
+        "تداول مؤشر ناسداك خلال الأسابيع الماضية في نطاق محدد بوضوح، مسجلًا دعمًا قرب أدنى مستوياته الأخيرة ومواجهًا مقاومة قريبة من القمم التاريخية. أي اختراق حاسم فوق المقاومة بحجم تداول مرتفع سيفتح الطريق نحو مستويات قياسية جديدة، في حين أن الاختراق تحت الدعم سينقل المشهد قصير المدى نحو مزيد من الحذر، خصوصًا مع اقتراب نتائج أعمال كبرى شركات التكنولوجيا.",
       authorId: analyst.id,
+      published: true,
     },
     {
-      slug: "us-tech-sector-review",
-      title: "US Technology Sector Review",
-      summary:
-        "A review of major trends across leading US technology companies.",
+      slug: "saudi-banking-sector-fundamental-review",
+      title: "مراجعة أساسية لقطاع البنوك السعودي: الهوامش لا تزال في توسع",
+      type: "أساسي",
+      summary: "البنوك السعودية تستمر في الاستفادة من نمو التمويل، مع استقرار جودة الأصول.",
       content:
-        "US technology companies continue to benefit from cloud adoption, artificial intelligence and digital transformation. Valuation and macroeconomic risks remain important considerations.",
-      stockId: stockBySymbol["MSFT"].id,
+        "تُظهر مراجعتنا لقطاع البنوك المدرجة في السوق السعودي أن هوامش الفائدة الصافية لا تزال في مستويات صحية، مدعومة بنمو مستمر في محافظ التمويل العقاري والتجاري. مؤشرات جودة الأصول لا تزال مستقرة عبر الأسماء التي نغطيها، مع تحسن تدريجي في كفاءة التكلفة بفعل التحول الرقمي المتسارع في القطاع.",
       authorId: analyst.id,
-    },
-    {
-      slug: "ai-semiconductor-analysis",
-      title: "AI Semiconductor Analysis",
-      summary:
-        "An overview of artificial intelligence and semiconductor investment themes.",
-      content:
-        "AI infrastructure investment continues to support demand for advanced computing hardware. Semiconductor companies remain sensitive to valuation, supply-chain conditions and technology cycles.",
-      stockId: stockBySymbol["NVDA"].id,
-      authorId: analyst.id,
+      published: true,
+      stockId: bySymbol["1120"].id,
     },
   ]);
 
-  // =========================
-  // PACKAGES
-  // =========================
+  // ---------------- Packages ----------------
   await db.insert(schema.packages).values([
     {
-      name: "Starter",
+      name: "الباقة الأساسية",
+      nameAr: "الباقة الأساسية",
       slug: "starter",
-      description: "Essential market access for individual investors.",
+      description: "بيانات السوق والأخبار الأساسية للمستثمر المستقل.",
       priceMonthly: 0,
       priceYearly: 0,
       features: JSON.stringify([
-        "Market overview",
-        "Saudi market access",
-        "US market access",
-        "Basic watchlist",
+        "أسعار السوق شبه اللحظية",
+        "أخبار السوق اليومية",
+        "قائمة متابعة أساسية (حتى ١٠ أسهم)",
       ]),
     },
     {
-      name: "Pro",
+      name: "الباقة الاحترافية",
+      nameAr: "الباقة الاحترافية",
       slug: "pro",
-      description: "Advanced tools and research for active investors.",
-      priceMonthly: 299,
-      priceYearly: 2990,
+      description: "خلاصة كاملة للتوصيات وأدوات إدارة المحفظة للمستثمر النشط.",
+      priceMonthly: 29,
+      priceYearly: 290,
       features: JSON.stringify([
-        "Everything in Starter",
-        "Advanced recommendations",
-        "Market analysis",
-        "Price history",
-        "Advanced watchlist",
+        "كل ما في الباقة الأساسية",
+        "خلاصة كاملة لتوصيات المحللين",
+        "قائمة متابعة وتنبيهات سعرية غير محدودة",
+        "تتبّع المحفظة",
       ]),
     },
     {
-      name: "Elite",
+      name: "الباقة المتميزة",
+      nameAr: "الباقة المتميزة",
       slug: "elite",
-      description: "Premium research and advanced investment insights.",
-      priceMonthly: 799,
-      priceYearly: 7990,
+      description: "أولوية الوصول للبحث ودعم مخصص للمتداولين الجادين.",
+      priceMonthly: 79,
+      priceYearly: 790,
       features: JSON.stringify([
-        "Everything in Pro",
-        "Premium research",
-        "Advanced market insights",
-        "Priority support",
-        "Premium reports",
+        "كل ما في الباقة الاحترافية",
+        "وصول مبكر للتوصيات الجديدة",
+        "تقارير فنية وأساسية متعمقة",
+        "دعم فني ذو أولوية",
       ]),
     },
   ]);
 
-  console.log("");
-  console.log("SFC Capital seed completed successfully.");
-  console.log("");
-  console.log("Markets:");
-  console.log("- Saudi Arabia / Tadawul");
-  console.log("- United States / NASDAQ");
-  console.log("");
-  console.log("Demo logins:");
-  console.log("admin@sfccapital.com");
-  console.log("analyst@sfccapital.com");
-  console.log("customer@sfccapital.com");
-  console.log("Password: Password123!");
+  console.log("Seed complete.");
+  console.log("Demo logins (password: Password123!):");
+  console.log("  admin@sfccapital.com (ADMIN)");
+  console.log("  analyst@sfccapital.com (ANALYST)");
+  console.log("  customer@sfccapital.com (CUSTOMER)");
 }
 
 main()
-  .catch((error) => {
-    console.error("Seed failed:", error);
-    process.exit(1);
+  .catch((e) => {
+    console.error(e);
+    process.exitCode = 1;
   })
-  .finally(() => process.exit(0));
-
-
-
-
-
-
+  .finally(() => {
+    process.exit(process.exitCode ?? 0);
+  });

@@ -8,6 +8,13 @@
       "when": 1788337920791,
       "tag": "0000_fancy_maginty",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789034250034,
+      "tag": "0001_fantastic_celestials",
+      "breakpoints": true
     }
   ]
 }

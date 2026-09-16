@@ -5,7 +5,7 @@ import { eq, and } from "drizzle-orm";
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 
   const rows = await db
     .select({
@@ -26,10 +26,10 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 
   const { stockId } = await req.json();
-  if (!stockId) return NextResponse.json({ error: "stockId required" }, { status: 400 });
+  if (!stockId) return NextResponse.json({ error: "رمز السهم مطلوب" }, { status: 400 });
 
   const existingRows = await db
     .select()
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 
   const { id } = await req.json();
   await db

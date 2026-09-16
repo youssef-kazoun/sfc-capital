@@ -40,10 +40,10 @@ export const stocks = pgTable("stocks", {
   id: id(),
   symbol: text("symbol").notNull().unique(),
   name: text("name").notNull(),
-  exchange: text("exchange").notNull().default("EGX"),
+  exchange: text("exchange").notNull().default("NASDAQ"),
   sector: text("sector"),
   logoUrl: text("logo_url"),
-  currency: text("currency").notNull().default("EGP"),
+  currency: text("currency").notNull().default("USD"),
   lastPrice: real("last_price").notNull().default(0),
   changePct: real("change_pct").notNull().default(0),
   volume: integer("volume").notNull().default(0),
@@ -233,7 +233,7 @@ export const payments = pgTable("payments", {
     .notNull()
     .references(() => subscriptions.id, { onDelete: "cascade" }),
   amount: real("amount").notNull(),
-  currency: text("currency").notNull().default("EGP"),
+  currency: text("currency").notNull().default("USD"),
   status: text("status", {
     enum: ["PENDING", "SUCCEEDED", "FAILED", "REFUNDED"],
   })

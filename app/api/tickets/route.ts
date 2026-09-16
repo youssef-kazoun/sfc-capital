@@ -5,7 +5,7 @@ import { eq, desc } from "drizzle-orm";
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 
   const rows = await db
     .select()
@@ -19,10 +19,10 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 
   const { subject, message, priority } = await req.json();
-  if (!subject || !message) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  if (!subject || !message) return NextResponse.json({ error: "بيانات ناقصة" }, { status: 400 });
 
   const [ticket] = await db
     .insert(schema.tickets)

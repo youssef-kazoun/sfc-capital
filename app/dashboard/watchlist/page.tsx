@@ -56,7 +56,7 @@ export default function WatchlistPage() {
                 <div className="font-mono">{formatCurrency(r.lastPrice, r.currency)}</div>
                 <PriceChange value={r.changePct} />
               </div>
-              <button onClick={() => remove(r.id)} aria-label="Remove" className="text-slate hover:text-loss">
+              <button onClick={() => remove(r.id)} aria-label="إزالة" className="text-slate hover:text-loss">
                 <X className="h-4 w-4" />
               </button>
             </div>

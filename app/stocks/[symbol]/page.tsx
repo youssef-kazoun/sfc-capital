@@ -8,6 +8,17 @@ import { NewsCard } from "@/components/site/cards";
 import { Badge, PriceChange } from "@/components/ui/primitives";
 import { formatCurrency } from "@/lib/utils";
 
+const EXCHANGE_LABELS: Record<string, string> = {
+  TADAWUL: "تداول السعودية",
+  NASDAQ: "ناسداك",
+  NYSE: "بورصة نيويورك",
+};
+
+const CURRENCY_LABELS: Record<string, string> = {
+  SAR: "ريال سعودي",
+  USD: "دولار أمريكي",
+};
+
 export default async function StockDetailPage({
   params,
 }: {
@@ -43,7 +54,7 @@ export default async function StockDetailPage({
         <div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm text-slate">{stock.symbol}</span>
-            <Badge>{stock.exchange}</Badge>
+            <Badge>{EXCHANGE_LABELS[stock.exchange] || stock.exchange}</Badge>
             {stock.sector && <Badge tone="gold">{stock.sector}</Badge>}
           </div>
           <h1 className="font-display text-3xl text-ink mt-1">{stock.name}</h1>
@@ -64,8 +75,8 @@ export default async function StockDetailPage({
       <div className="grid sm:grid-cols-4 gap-4 mb-12">
         <StatBox label="حجم التداول" value={stock.volume.toLocaleString()} />
         <StatBox label="القيمة السوقية" value={stock.marketCap ? formatCurrency(stock.marketCap, stock.currency) : "—"} />
-        <StatBox label="العملة" value={stock.currency} />
-        <StatBox label="البورصة" value={stock.exchange} />
+        <StatBox label="العملة" value={CURRENCY_LABELS[stock.currency] || stock.currency} />
+        <StatBox label="البورصة" value={EXCHANGE_LABELS[stock.exchange] || stock.exchange} />
       </div>
 
       {relatedNews.length > 0 && (

@@ -15,7 +15,7 @@ const en = {
     logout: "Log out",
   },
   home: {
-    heroTitle: "Invest with confidence in the Egyptian market",
+    heroTitle: "Invest with confidence in Saudi and US markets",
     heroSubtitle:
       "Real-time quotes, expert recommendations, and portfolio tools — all in one platform.",
     ctaPrimary: "Get started free",

@@ -14,6 +14,7 @@ interface AlertRow {
   symbol: string;
   name: string;
   lastPrice: number;
+  currency: string;
 }
 
 export default function AlertsPage() {
@@ -56,7 +57,7 @@ export default function AlertsPage() {
               </div>
               <div className="text-sm text-ink/80">
                 تنبيه عند {r.condition === "ABOVE" ? "ارتفاع السعر فوق" : "انخفاض السعر تحت"}{" "}
-                <span className="font-mono">{formatCurrency(r.targetPrice, "EGP")}</span>
+                <span className="font-mono">{formatCurrency(r.targetPrice, r.currency)}</span>
               </div>
               <Badge tone={r.triggered ? "gold" : "neutral"}>{r.triggered ? "تم التنبيه" : "نشط"}</Badge>
               <button onClick={() => remove(r.id)} className="text-slate hover:text-loss">

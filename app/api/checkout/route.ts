@@ -6,12 +6,12 @@ import { getPaymentProvider } from "@/services/payments";
 
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 
   const { packageId, billingCycle } = await req.json();
   const pkgRows = await db.select().from(schema.packages).where(eq(schema.packages.id, packageId));
   const pkg = pkgRows[0];
-  if (!pkg) return NextResponse.json({ error: "Package not found" }, { status: 404 });
+  if (!pkg) return NextResponse.json({ error: "الباقة غير موجودة" }, { status: 404 });
 
   const amount = billingCycle === "yearly" ? pkg.priceYearly : pkg.priceMonthly;
 

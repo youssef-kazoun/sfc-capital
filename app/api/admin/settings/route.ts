@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   try {
     await requireApiRole(["ADMIN"]);
     const { key, value } = await req.json();
-    if (!key) return NextResponse.json({ error: "key required" }, { status: 400 });
+    if (!key) return NextResponse.json({ error: "المفتاح مطلوب" }, { status: 400 });
 
     await db
       .insert(schema.siteSettings)

@@ -7,9 +7,9 @@ import Footer from "@/components/site/footer";
 import type { Locale } from "@/lib/i18n/context";
 
 export const metadata: Metadata = {
-  title: "SFC Capital — بيانات السوق المصري",
+  title: "SFC Capital — الأسواق السعودية والأمريكية",
   description:
-    "أسعار لحظية، توصيات من خبراء، وأدوات لإدارة المحفظة للبورصة المصرية.",
+    "أسعار لحظية، توصيات من خبراء، وأدوات لإدارة المحفظة للأسواق السعودية والأمريكية.",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

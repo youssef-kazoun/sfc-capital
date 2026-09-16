@@ -7,14 +7,14 @@ const STAFF = ["ADMIN", "SUPPORT", "ANALYST"];
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
   const { id } = await ctx.params;
 
   const ticketRows = await db.select().from(schema.tickets).where(eq(schema.tickets.id, id));
   const ticket = ticketRows[0];
-  if (!ticket) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!ticket) return NextResponse.json({ error: "غير موجود" }, { status: 404 });
   if (ticket.userId !== session.user.id && !STAFF.includes(session.user.role)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "ليس لديك صلاحية" }, { status: 403 });
   }
 
   const messages = await db
@@ -36,7 +36,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user || !STAFF.includes(session.user.role)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "ليس لديك صلاحية" }, { status: 403 });
   }
   const { id } = await ctx.params;
   const { status } = await req.json();

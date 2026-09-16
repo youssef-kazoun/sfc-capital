@@ -11,7 +11,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     const { id } = await ctx.params;
     const rowRows = await db.select().from(schema.newsArticles).where(eq(schema.newsArticles.id, id));
   const row = rowRows[0];
-    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!row) return NextResponse.json({ error: "غير موجود" }, { status: 404 });
     return NextResponse.json(row);
   } catch (err) {
     return apiErrorResponse(err);
