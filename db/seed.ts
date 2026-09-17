@@ -2,21 +2,33 @@ import "dotenv/config";
 import { db, schema } from "../db";
 import bcrypt from "bcryptjs";
 
+type NewsSeedItem = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  market: string;
+  authorId: string;
+  published: boolean;
+  publishedAt: string;
+  stockSymbol?: string;
+};
+
 async function main() {
   console.log("Seeding database...");
 
   // ---------------- Users ----------------
   const passwordHash = await bcrypt.hash("Password123!", 10);
 
-  const [admin] = await db
-    .insert(schema.users)
-    .values({
-      name: "مدير النظام",
-      email: "admin@sfccapital.com",
-      passwordHash,
-      role: "ADMIN",
-    })
-    .returning();
+  await db
+  .insert(schema.users)
+  .values({
+    name: "مدير النظام",
+    email: "admin@sfccapital.com",
+    passwordHash,
+    role: "ADMIN",
+  });
 
   const [analyst] = await db
     .insert(schema.users)
@@ -28,51 +40,230 @@ async function main() {
     })
     .returning();
 
-  const [customer] = await db
-    .insert(schema.users)
-    .values({
-      name: "عميل تجريبي",
-      email: "customer@sfccapital.com",
-      passwordHash,
-      role: "CUSTOMER",
-    })
-    .returning();
+  await db
+  .insert(schema.users)
+  .values({
+    name: "عميل تجريبي",
+    email: "customer@sfccapital.com",
+    passwordHash,
+    role: "CUSTOMER",
+  });
 
   // ---------------- Stocks: Saudi (Tadawul) + US (NASDAQ/NYSE) ----------------
   const stockSeed = [
-    // Saudi market — Tadawul, priced in SAR
-    { symbol: "2222", name: "أرامكو السعودية", exchange: "TADAWUL", sector: "الطاقة", currency: "SAR", lastPrice: 29.8, changePct: 0.6, volume: 12500000, marketCap: 7200000000000 },
-    { symbol: "1120", name: "مصرف الراجحي", exchange: "TADAWUL", sector: "بنوك", currency: "SAR", lastPrice: 86.4, changePct: 1.4, volume: 3100000, marketCap: 216000000000 },
-    { symbol: "2010", name: "سابك", exchange: "TADAWUL", sector: "صناعات كيماوية", currency: "SAR", lastPrice: 64.2, changePct: -0.5, volume: 1800000, marketCap: 192000000000 },
-    { symbol: "7010", name: "الاتصالات السعودية STC", exchange: "TADAWUL", sector: "اتصالات", currency: "SAR", lastPrice: 41.5, changePct: 0.9, volume: 2200000, marketCap: 166000000000 },
-    { symbol: "1211", name: "معادن", exchange: "TADAWUL", sector: "تعدين", currency: "SAR", lastPrice: 56.7, changePct: 2.1, volume: 2600000, marketCap: 113000000000 },
-    { symbol: "2280", name: "المراعي", exchange: "TADAWUL", sector: "سلع استهلاكية", currency: "SAR", lastPrice: 48.3, changePct: -0.3, volume: 700000, marketCap: 45000000000 },
-    // US market — NASDAQ/NYSE, priced in USD
-    { symbol: "AAPL", name: "آبل", exchange: "NASDAQ", sector: "تكنولوجيا", currency: "USD", lastPrice: 194.5, changePct: 0.8, volume: 48000000, marketCap: 3000000000000 },
-    { symbol: "MSFT", name: "مايكروسوفت", exchange: "NASDAQ", sector: "تكنولوجيا", currency: "USD", lastPrice: 421.3, changePct: 1.1, volume: 21000000, marketCap: 3100000000000 },
-    { symbol: "NVDA", name: "إنفيديا", exchange: "NASDAQ", sector: "أشباه الموصلات", currency: "USD", lastPrice: 878.2, changePct: 3.4, volume: 39000000, marketCap: 2160000000000 },
-    { symbol: "AMZN", name: "أمازون", exchange: "NASDAQ", sector: "تجزئة", currency: "USD", lastPrice: 178.9, changePct: -0.6, volume: 33000000, marketCap: 1860000000000 },
-    { symbol: "TSLA", name: "تسلا", exchange: "NASDAQ", sector: "سيارات", currency: "USD", lastPrice: 244.8, changePct: -1.8, volume: 71000000, marketCap: 780000000000 },
-    { symbol: "JPM", name: "جي بي مورجان تشيس", exchange: "NYSE", sector: "بنوك", currency: "USD", lastPrice: 204.6, changePct: 0.5, volume: 8200000, marketCap: 590000000000 },
+    {
+      symbol: "2222",
+      name: "أرامكو السعودية",
+      exchange: "TADAWUL",
+      sector: "الطاقة",
+      currency: "SAR",
+      lastPrice: 29.8,
+      changePct: 0.6,
+      volume: 12500000,
+      marketCap: 7200000000000,
+      isConventionalFinance: false,
+      debtRatio: 8.5,
+      cashRatio: 6.0,
+      nonCompliantIncomeRatio: 0.8,
+    },
+    {
+      symbol: "1120",
+      name: "مصرف الراجحي",
+      exchange: "TADAWUL",
+      sector: "بنوك إسلامية",
+      currency: "SAR",
+      lastPrice: 86.4,
+      changePct: 1.4,
+      volume: 3100000,
+      marketCap: 216000000000,
+      isConventionalFinance: false,
+      debtRatio: 12.0,
+      cashRatio: 9.0,
+      nonCompliantIncomeRatio: 1.5,
+    },
+    {
+      symbol: "2010",
+      name: "سابك",
+      exchange: "TADAWUL",
+      sector: "صناعات كيماوية",
+      currency: "SAR",
+      lastPrice: 64.2,
+      changePct: -0.5,
+      volume: 1800000,
+      marketCap: 192000000000,
+      isConventionalFinance: false,
+      debtRatio: 24.5,
+      cashRatio: 14.0,
+      nonCompliantIncomeRatio: 1.8,
+    },
+    {
+      symbol: "7010",
+      name: "الاتصالات السعودية STC",
+      exchange: "TADAWUL",
+      sector: "اتصالات",
+      currency: "SAR",
+      lastPrice: 41.5,
+      changePct: 0.9,
+      volume: 2200000,
+      marketCap: 166000000000,
+      isConventionalFinance: false,
+      debtRatio: 32.0,
+      cashRatio: 19.0,
+      nonCompliantIncomeRatio: 2.9,
+    },
+    {
+      symbol: "1211",
+      name: "معادن",
+      exchange: "TADAWUL",
+      sector: "تعدين",
+      currency: "SAR",
+      lastPrice: 56.7,
+      changePct: 2.1,
+      volume: 2600000,
+      marketCap: 113000000000,
+      isConventionalFinance: false,
+      debtRatio: 36.5,
+      cashRatio: 9.5,
+      nonCompliantIncomeRatio: 1.2,
+    },
+    {
+      symbol: "2280",
+      name: "المراعي",
+      exchange: "TADAWUL",
+      sector: "سلع استهلاكية",
+      currency: "SAR",
+      lastPrice: 48.3,
+      changePct: -0.3,
+      volume: 700000,
+      marketCap: 45000000000,
+      isConventionalFinance: false,
+      debtRatio: 27.5,
+      cashRatio: 10.5,
+      nonCompliantIncomeRatio: 2.1,
+    },
+    {
+      symbol: "AAPL",
+      name: "آبل",
+      exchange: "NASDAQ",
+      sector: "تكنولوجيا",
+      currency: "USD",
+      lastPrice: 194.5,
+      changePct: 0.8,
+      volume: 48000000,
+      marketCap: 3000000000000,
+      isConventionalFinance: false,
+      debtRatio: 32.0,
+      cashRatio: 25.0,
+      nonCompliantIncomeRatio: 1.0,
+    },
+    {
+      symbol: "MSFT",
+      name: "مايكروسوفت",
+      exchange: "NASDAQ",
+      sector: "تكنولوجيا",
+      currency: "USD",
+      lastPrice: 421.3,
+      changePct: 1.1,
+      volume: 21000000,
+      marketCap: 3100000000000,
+      isConventionalFinance: false,
+      debtRatio: 20.0,
+      cashRatio: 15.0,
+      nonCompliantIncomeRatio: 1.0,
+    },
+    {
+      symbol: "NVDA",
+      name: "إنفيديا",
+      exchange: "NASDAQ",
+      sector: "أشباه الموصلات",
+      currency: "USD",
+      lastPrice: 878.2,
+      changePct: 3.4,
+      volume: 39000000,
+      marketCap: 2160000000000,
+      isConventionalFinance: false,
+      debtRatio: 5.0,
+      cashRatio: 8.0,
+      nonCompliantIncomeRatio: 0.5,
+    },
+    {
+      symbol: "AMZN",
+      name: "أمازون",
+      exchange: "NASDAQ",
+      sector: "تجزئة",
+      currency: "USD",
+      lastPrice: 178.9,
+      changePct: -0.6,
+      volume: 33000000,
+      marketCap: 1860000000000,
+      isConventionalFinance: false,
+      debtRatio: 29.5,
+      cashRatio: 12.0,
+      nonCompliantIncomeRatio: 2.0,
+    },
+    {
+      symbol: "TSLA",
+      name: "تسلا",
+      exchange: "NASDAQ",
+      sector: "سيارات",
+      currency: "USD",
+      lastPrice: 244.8,
+      changePct: -1.8,
+      volume: 71000000,
+      marketCap: 780000000000,
+      isConventionalFinance: false,
+      debtRatio: 22.0,
+      cashRatio: 18.0,
+      nonCompliantIncomeRatio: 1.0,
+    },
+    {
+      symbol: "JPM",
+      name: "جي بي مورجان تشيس",
+      exchange: "NYSE",
+      sector: "بنوك تقليدية",
+      currency: "USD",
+      lastPrice: 204.6,
+      changePct: 0.5,
+      volume: 8200000,
+      marketCap: 590000000000,
+      isConventionalFinance: true,
+      debtRatio: null,
+      cashRatio: null,
+      nonCompliantIncomeRatio: null,
+    },
   ];
 
-  const stocks = await db.insert(schema.stocks).values(stockSeed).returning();
-  const bySymbol = Object.fromEntries(stocks.map((s) => [s.symbol, s]));
+  const stocks = await db
+    .insert(schema.stocks)
+    .values(stockSeed)
+    .returning();
+
+  const bySymbol = Object.fromEntries(
+    stocks.map((s) => [s.symbol, s])
+  );
 
   // ---------------- Price history (90 days synthetic walk) ----------------
   for (const stock of stocks) {
     let price = stock.lastPrice * 0.8;
     const rows = [];
     const today = new Date();
+
     for (let i = 90; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
+
       const changePct = (Math.random() - 0.47) * 3;
       const open = price;
-      price = Math.max(0.5, price * (1 + changePct / 100));
+
+      price = Math.max(
+        0.5,
+        price * (1 + changePct / 100)
+      );
+
       const close = i === 0 ? stock.lastPrice : price;
       const high = Math.max(open, close) * 1.01;
       const low = Math.min(open, close) * 0.99;
+
       rows.push({
         stockId: stock.id,
         date: d.toISOString().slice(0, 10),
@@ -80,14 +271,17 @@ async function main() {
         high: Number(high.toFixed(2)),
         low: Number(low.toFixed(2)),
         close: Number(close.toFixed(2)),
-        volume: Math.floor(200000 + Math.random() * 2000000),
+        volume: Math.floor(
+          200000 + Math.random() * 2000000
+        ),
       });
     }
+
     await db.insert(schema.priceHistory).values(rows);
   }
 
   // ---------------- News ----------------
-  const newsSeed = [
+  const newsSeed: NewsSeedItem[] = [
     {
       slug: "fed-holds-interest-rates-steady",
       title: "الاحتياطي الفيدرالي الأمريكي يبقي على أسعار الفائدة دون تغيير",
@@ -96,6 +290,7 @@ async function main() {
       content:
         "قرر الاحتياطي الفيدرالي الأمريكي الإبقاء على سعر الفائدة القياسي دون تغيير في اجتماعه الأخير، في خطوة كانت متوقعة على نطاق واسع من الأسواق. وأشار رئيس الاحتياطي الفيدرالي إلى أن اللجنة تحتاج إلى مزيد من الثقة في استمرار تراجع التضخم نحو المستوى المستهدف قبل الشروع في خفض أسعار الفائدة، مما أبقى الأسواق في حالة ترقب لمسار السياسة النقدية خلال الأشهر المقبلة.",
       category: "الاقتصاد الكلي",
+      market: "US",
       authorId: analyst.id,
       published: true,
       publishedAt: new Date().toISOString(),
@@ -108,9 +303,12 @@ async function main() {
       content:
         "أعلنت أرامكو السعودية عن نتائج مالية فصلية تجاوزت توقعات المحللين، مدعومة باستقرار أسعار النفط العالمية وتحسن كفاءة التشغيل عبر مختلف قطاعات الشركة. وأكدت الشركة التزامها بخطط التوزيعات للمساهمين، مشيرة إلى استمرار الاستثمار في مشاريع التوسع بقطاعي التكرير والكيماويات.",
       category: "الأرباح",
+      market: "SAUDI",
       authorId: analyst.id,
       published: true,
-      publishedAt: new Date(Date.now() - 86400000).toISOString(),
+      publishedAt: new Date(
+        Date.now() - 86400000
+      ).toISOString(),
       stockSymbol: "2222",
     },
     {
@@ -121,9 +319,12 @@ async function main() {
       content:
         "كشفت آبل عن خطط لتوسيع نطاق خدماتها الرقمية بعد أن سجل هذا القطاع نموًا قويًا في الإيرادات المتكررة خلال الأرباع الأخيرة. وقال مسؤولو الشركة إن التركيز المتزايد على الخدمات يأتي في إطار استراتيجية لتنويع مصادر الإيرادات بعيدًا عن مبيعات الأجهزة التقليدية.",
       category: "الشركات",
+      market: "US",
       authorId: analyst.id,
       published: true,
-      publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+      publishedAt: new Date(
+        Date.now() - 2 * 86400000
+      ).toISOString(),
       stockSymbol: "AAPL",
     },
     {
@@ -134,16 +335,24 @@ async function main() {
       content:
         "أغلق المؤشر العام للسوق السعودي (تاسي) مرتفعًا في جلسة تداول حديثة، بقيادة مكاسب في قطاع البنوك ومن أبرزها مصرف الراجحي. وأشار المتداولون إلى تحسن المعنويات حول أرباح القطاع المصرفي مع استمرار الطلب على التمويل واستقرار جودة الأصول.",
       category: "الأسواق",
+      market: "SAUDI",
       authorId: analyst.id,
       published: true,
-      publishedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+      publishedAt: new Date(
+        Date.now() - 3 * 86400000
+      ).toISOString(),
       stockSymbol: "1120",
     },
   ];
 
   for (const n of newsSeed) {
-    const { stockSymbol, ...rest } = n as any;
-    const [article] = await db.insert(schema.newsArticles).values(rest).returning();
+    const { stockSymbol, ...rest } = n;
+
+    const [article] = await db
+      .insert(schema.newsArticles)
+      .values(rest)
+      .returning();
+
     if (stockSymbol && bySymbol[stockSymbol]) {
       await db.insert(schema.newsArticleStocks).values({
         newsId: article.id,
@@ -213,6 +422,7 @@ async function main() {
 
   for (const r of recSeed) {
     const stock = bySymbol[r.symbol];
+
     await db.insert(schema.recommendations).values({
       stockId: stock.id,
       action: r.action,
@@ -233,7 +443,8 @@ async function main() {
       slug: "nasdaq-technical-outlook-q3",
       title: "التوقعات الفنية لمؤشر ناسداك: النطاق الحالي والمستويات الرئيسية",
       type: "فني",
-      summary: "المؤشر يتماسك بين نطاقي دعم ومقاومة رئيسيين قبل موسم أرباح قطاع التكنولوجيا.",
+      summary:
+        "المؤشر يتماسك بين نطاقي دعم ومقاومة رئيسيين قبل موسم أرباح قطاع التكنولوجيا.",
       content:
         "تداول مؤشر ناسداك خلال الأسابيع الماضية في نطاق محدد بوضوح، مسجلًا دعمًا قرب أدنى مستوياته الأخيرة ومواجهًا مقاومة قريبة من القمم التاريخية. أي اختراق حاسم فوق المقاومة بحجم تداول مرتفع سيفتح الطريق نحو مستويات قياسية جديدة، في حين أن الاختراق تحت الدعم سينقل المشهد قصير المدى نحو مزيد من الحذر، خصوصًا مع اقتراب نتائج أعمال كبرى شركات التكنولوجيا.",
       authorId: analyst.id,
@@ -243,7 +454,8 @@ async function main() {
       slug: "saudi-banking-sector-fundamental-review",
       title: "مراجعة أساسية لقطاع البنوك السعودي: الهوامش لا تزال في توسع",
       type: "أساسي",
-      summary: "البنوك السعودية تستمر في الاستفادة من نمو التمويل، مع استقرار جودة الأصول.",
+      summary:
+        "البنوك السعودية تستمر في الاستفادة من نمو التمويل، مع استقرار جودة الأصول.",
       content:
         "تُظهر مراجعتنا لقطاع البنوك المدرجة في السوق السعودي أن هوامش الفائدة الصافية لا تزال في مستويات صحية، مدعومة بنمو مستمر في محافظ التمويل العقاري والتجاري. مؤشرات جودة الأصول لا تزال مستقرة عبر الأسماء التي نغطيها، مع تحسن تدريجي في كفاءة التكلفة بفعل التحول الرقمي المتسارع في القطاع.",
       authorId: analyst.id,
@@ -271,7 +483,8 @@ async function main() {
       name: "الباقة الاحترافية",
       nameAr: "الباقة الاحترافية",
       slug: "pro",
-      description: "خلاصة كاملة للتوصيات وأدوات إدارة المحفظة للمستثمر النشط.",
+      description:
+        "خلاصة كاملة للتوصيات وأدوات إدارة المحفظة للمستثمر النشط.",
       priceMonthly: 29,
       priceYearly: 290,
       features: JSON.stringify([
@@ -285,7 +498,8 @@ async function main() {
       name: "الباقة المتميزة",
       nameAr: "الباقة المتميزة",
       slug: "elite",
-      description: "أولوية الوصول للبحث ودعم مخصص للمتداولين الجادين.",
+      description:
+        "أولوية الوصول للبحث ودعم مخصص للمتداولين الجادين.",
       priceMonthly: 79,
       priceYearly: 790,
       features: JSON.stringify([
@@ -295,6 +509,24 @@ async function main() {
         "دعم فني ذو أولوية",
       ]),
     },
+  ]);
+
+  // ---------------- Site settings (editable stats/social) ----------------
+  await db.insert(schema.siteSettings).values([
+    { key: "stat_users", value: "0" },
+    { key: "stat_recommendations", value: "0" },
+    { key: "stat_alerts_sent", value: "0" },
+    { key: "stat_accuracy", value: "0" },
+    { key: "whatsapp_number", value: "" },
+    { key: "telegram_url", value: "" },
+    { key: "facebook_url", value: "" },
+    { key: "youtube_url", value: "" },
+    { key: "x_url", value: "" },
+    { key: "instagram_url", value: "" },
+    { key: "tiktok_url", value: "" },
+    { key: "snapchat_url", value: "" },
+    { key: "linkedin_url", value: "" },
+    { key: "special_offers", value: "[]" },
   ]);
 
   console.log("Seed complete.");

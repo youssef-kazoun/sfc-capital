@@ -1,20 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Input, Select, Card } from "@/components/ui/primitives";
+import { Button, Input, Select, Textarea, Card } from "@/components/ui/primitives";
 
-const KNOWN_KEYS: {
+interface SettingField {
   key: string;
   label: string;
   placeholder?: string;
-  arabicLabel?: string;
-  type?: "text" | "boolean";
-}[] = [
-  { key: "site_name", label: "اسم الموقع", arabicLabel: "اسم الموقع", placeholder: "SFC Capital", type: "text" },
-  { key: "support_email", label: "بريد الدعم الفني", arabicLabel: "بريد الدعم الفني", placeholder: "support@sfccapital.com", type: "text" },
-  { key: "support_phone", label: "هاتف الدعم الفني", arabicLabel: "هاتف الدعم الفني", placeholder: "+966 50 000 0000", type: "text" },
-  { key: "maintenance_mode", label: "وضع الصيانة", arabicLabel: "وضع الصيانة", type: "boolean" },
+  type?: "text" | "boolean" | "textarea";
+}
+
+const GENERAL_FIELDS: SettingField[] = [
+  { key: "site_name", label: "اسم الموقع", placeholder: "SFC Capital" },
+  { key: "support_email", label: "بريد الدعم الفني", placeholder: "support@sfccapital.com" },
+  { key: "support_phone", label: "هاتف الدعم الفني", placeholder: "+966 50 000 0000" },
+  { key: "maintenance_mode", label: "وضع الصيانة", type: "boolean" },
 ];
+
+const STATS_FIELDS: SettingField[] = [
+  { key: "stat_users", label: "عدد العملاء", placeholder: "5000" },
+  { key: "stat_recommendations", label: "عدد التوصيات المنشورة", placeholder: "1200" },
+  { key: "stat_alerts_sent", label: "عدد التنبيهات المرسلة", placeholder: "30000" },
+  { key: "stat_accuracy", label: "دقة التوصيات (%)", placeholder: "87" },
+];
+
+const SOCIAL_FIELDS: SettingField[] = [
+  { key: "whatsapp_number", label: "رقم واتساب (بالصيغة الدولية بدون +)", placeholder: "9665XXXXXXXX" },
+  { key: "telegram_url", label: "رابط تيليجرام" },
+  { key: "facebook_url", label: "رابط فيسبوك" },
+  { key: "youtube_url", label: "رابط يوتيوب" },
+  { key: "x_url", label: "رابط إكس (تويتر)" },
+  { key: "instagram_url", label: "رابط إنستجرام" },
+  { key: "tiktok_url", label: "رابط تيك توك" },
+  { key: "snapchat_url", label: "رابط سناب شات" },
+  { key: "linkedin_url", label: "رابط لينكدإن" },
+];
+
+const OFFERS_FIELD: SettingField = {
+  key: "special_offers",
+  label: 'العروض الخاصة (JSON — مصفوفة من {"title","description","badge"})',
+  type: "textarea",
+};
 
 export default function AdminSettingsPage() {
   const [values, setValues] = useState<Record<string, string>>({});
@@ -30,47 +56,75 @@ export default function AdminSettingsPage() {
       });
   }, []);
 
-  async function saveKey(key: string, arabicLabel: string) {
+  async function saveKey(key: string, label: string) {
     setStatus(null);
     await fetch("/api/admin/settings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ key, value: values[key] || "" }),
     });
-    setStatus(`تم حفظ ${arabicLabel}`);
+    setStatus(`تم حفظ: ${label}`);
+  }
+
+  function renderField(f: SettingField) {
+    return (
+      <div key={f.key} className="flex items-end gap-2">
+        <div className="flex-1">
+          <label className="text-xs text-slate">{f.label}</label>
+          {f.type === "boolean" ? (
+            <Select
+              value={values[f.key] || "false"}
+              onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+            >
+              <option value="false">مُعطّل</option>
+              <option value="true">مُفعّل</option>
+            </Select>
+          ) : f.type === "textarea" ? (
+            <Textarea
+              rows={5}
+              placeholder={f.placeholder}
+              value={values[f.key] || ""}
+              onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+            />
+          ) : (
+            <Input
+              placeholder={f.placeholder}
+              value={values[f.key] || ""}
+              onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+            />
+          )}
+        </div>
+        <Button variant="secondary" onClick={() => saveKey(f.key, f.label)}>حفظ</Button>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1 className="font-display text-2xl text-ink mb-6">إعدادات الموقع</h1>
-      <Card className="max-w-lg space-y-4">
-        {KNOWN_KEYS.map((k) => (
-          <div key={k.key} className="flex items-end gap-2">
-            <div className="flex-1">
-              <label className="text-xs text-slate">{k.label}</label>
-              {k.type === "boolean" ? (
-                <Select
-                  value={values[k.key] || "false"}
-                  onChange={(e) => setValues({ ...values, [k.key]: e.target.value })}
-                >
-                  <option value="false">مُعطّل</option>
-                  <option value="true">مُفعّل</option>
-                </Select>
-              ) : (
-                <Input
-                  placeholder={k.placeholder}
-                  value={values[k.key] || ""}
-                  onChange={(e) => setValues({ ...values, [k.key]: e.target.value })}
-                />
-              )}
-            </div>
-            <Button variant="secondary" onClick={() => saveKey(k.key, k.arabicLabel || k.label)}>
-              حفظ
-            </Button>
-          </div>
-        ))}
-        {status && <p className="text-sm text-gain">{status}</p>}
-      </Card>
+    <div className="space-y-8">
+      <h1 className="font-display text-2xl text-ink">إعدادات الموقع</h1>
+
+      <div>
+        <h2 className="font-display text-lg text-ink mb-3">عام</h2>
+        <Card className="max-w-lg space-y-4">{GENERAL_FIELDS.map(renderField)}</Card>
+      </div>
+
+      <div>
+        <h2 className="font-display text-lg text-ink mb-3">الإحصائيات المعروضة في الصفحة الرئيسية</h2>
+        <Card className="max-w-lg space-y-4">{STATS_FIELDS.map(renderField)}</Card>
+      </div>
+
+      <div>
+        <h2 className="font-display text-lg text-ink mb-3">روابط التواصل الاجتماعي</h2>
+        <p className="text-xs text-slate mb-3">اتركها فاضية لإخفاء أي رابط من الفوتر تلقائيًا.</p>
+        <Card className="max-w-lg space-y-4">{SOCIAL_FIELDS.map(renderField)}</Card>
+      </div>
+
+      <div>
+        <h2 className="font-display text-lg text-ink mb-3">العروض الخاصة</h2>
+        <Card className="max-w-lg space-y-4">{renderField(OFFERS_FIELD)}</Card>
+      </div>
+
+      {status && <p className="text-sm text-gain">{status}</p>}
     </div>
   );
 }

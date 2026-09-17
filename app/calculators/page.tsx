@@ -12,6 +12,9 @@ export default function CalculatorsPage() {
         <PositionSizeCalculator />
         <CompoundGrowthCalculator />
         <DividendYieldCalculator />
+        <AveragePriceCalculator />
+        <CommissionPnlCalculator />
+        <SharesCalculator />
       </div>
     </div>
   );
@@ -117,6 +120,108 @@ function DividendYieldCalculator() {
         <Field label="التوزيعات السنوية للسهم" value={dividend} onChange={(e) => setDividend(+e.target.value)} />
       </div>
       <Result label="عائد التوزيعات" value={`${yieldPct.toFixed(2)}%`} />
+    </Card>
+  );
+}
+
+function AveragePriceCalculator() {
+  const [lots, setLots] = useState([{ qty: 100, price: 20 }, { qty: 50, price: 22 }]);
+
+  const totalQty = lots.reduce((sum, l) => sum + l.qty, 0);
+  const totalCost = lots.reduce((sum, l) => sum + l.qty * l.price, 0);
+  const avgPrice = totalQty ? totalCost / totalQty : 0;
+
+  function updateLot(i: number, field: "qty" | "price", value: number) {
+    setLots((prev) => prev.map((l, idx) => (idx === i ? { ...l, [field]: value } : l)));
+  }
+
+  return (
+    <Card>
+      <h3 className="font-display text-lg text-ink mb-4">متوسط السعر</h3>
+      <div className="space-y-3">
+        {lots.map((lot, i) => (
+          <div key={i} className="grid grid-cols-2 gap-3">
+            <Field label={`عدد الأسهم (صفقة ${i + 1})`} value={lot.qty} onChange={(e) => updateLot(i, "qty", +e.target.value)} />
+            <Field label={`سعر الشراء (صفقة ${i + 1})`} value={lot.price} onChange={(e) => updateLot(i, "price", +e.target.value)} />
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2 mt-3">
+        <button
+          type="button"
+          onClick={() => setLots((prev) => [...prev, { qty: 0, price: 0 }])}
+          className="text-xs text-gold"
+        >
+          + إضافة صفقة
+        </button>
+        {lots.length > 1 && (
+          <button
+            type="button"
+            onClick={() => setLots((prev) => prev.slice(0, -1))}
+            className="text-xs text-loss"
+          >
+            حذف آخر صفقة
+          </button>
+        )}
+      </div>
+      <Result label="إجمالي الأسهم" value={totalQty.toString()} />
+      <Result label="متوسط السعر" value={avgPrice.toFixed(3)} />
+    </Card>
+  );
+}
+
+function CommissionPnlCalculator() {
+  const [buyPrice, setBuyPrice] = useState(20);
+  const [sellPrice, setSellPrice] = useState(22);
+  const [qty, setQty] = useState(100);
+  const [commissionPct, setCommissionPct] = useState(0.15);
+
+  const buyValue = buyPrice * qty;
+  const sellValue = sellPrice * qty;
+  const buyCommission = buyValue * (commissionPct / 100);
+  const sellCommission = sellValue * (commissionPct / 100);
+  const netPnl = sellValue - buyValue - buyCommission - sellCommission;
+  const netPnlPct = buyValue ? (netPnl / buyValue) * 100 : 0;
+
+  return (
+    <Card>
+      <h3 className="font-display text-lg text-ink mb-4">الربح / الخسارة مع العمولة</h3>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="سعر الشراء" value={buyPrice} onChange={(e) => setBuyPrice(+e.target.value)} />
+        <Field label="سعر البيع" value={sellPrice} onChange={(e) => setSellPrice(+e.target.value)} />
+        <Field label="الكمية" value={qty} onChange={(e) => setQty(+e.target.value)} />
+        <Field label="نسبة العمولة (%)" value={commissionPct} onChange={(e) => setCommissionPct(+e.target.value)} />
+      </div>
+      <Result label="إجمالي العمولات" value={(buyCommission + sellCommission).toFixed(2)} />
+      <Result label="صافي الربح/الخسارة" value={netPnl.toFixed(2)} />
+      <Result label="نسبة العائد الصافية" value={`${netPnlPct.toFixed(2)}%`} />
+    </Card>
+  );
+}
+
+function SharesCalculator() {
+  const [balance, setBalance] = useState(10000);
+  const [price, setPrice] = useState(45);
+  const [commissionPct, setCommissionPct] = useState(0.15);
+
+  // Solve for max shares such that shares*price*(1+commission%) <= balance
+  const effectivePrice = price * (1 + commissionPct / 100);
+  const shares = effectivePrice ? Math.floor(balance / effectivePrice) : 0;
+  const totalCost = shares * price;
+  const commission = totalCost * (commissionPct / 100);
+  const remaining = balance - totalCost - commission;
+
+  return (
+    <Card>
+      <h3 className="font-display text-lg text-ink mb-4">حاسبة عدد الأسهم</h3>
+      <div className="grid grid-cols-3 gap-3">
+        <Field label="الرصيد المتاح" value={balance} onChange={(e) => setBalance(+e.target.value)} />
+        <Field label="سعر السهم" value={price} onChange={(e) => setPrice(+e.target.value)} />
+        <Field label="نسبة العمولة (%)" value={commissionPct} onChange={(e) => setCommissionPct(+e.target.value)} />
+      </div>
+      <Result label="عدد الأسهم الممكن شراؤها" value={shares.toString()} />
+      <Result label="التكلفة الإجمالية (مع العمولة)" value={(totalCost + commission).toFixed(2)} />
+      <Result label="الرصيد المتبقي" value={remaining.toFixed(2)} />
     </Card>
   );
 }

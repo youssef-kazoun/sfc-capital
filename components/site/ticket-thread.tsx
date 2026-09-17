@@ -11,6 +11,7 @@ interface Message {
   authorName: string;
   authorRole: string;
 }
+
 interface Ticket {
   id: string;
   subject: string;
@@ -25,14 +26,41 @@ const STATUS_LABELS: Record<string, string> = {
   CLOSED: "مغلقة",
 };
 
-export default function TicketThread({ ticketId, isStaff }: { ticketId: string; isStaff?: boolean }) {
+export default function TicketThread({
+  ticketId,
+  isStaff,
+}: {
+  ticketId: string;
+  isStaff?: boolean;
+}) {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [reply, setReply] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function load() {
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchTicket() {
+      const res = await fetch(`/api/tickets/${ticketId}`);
+
+      if (res.ok && !cancelled) {
+        const data = await res.json();
+        setTicket(data.ticket);
+        setMessages(data.messages);
+      }
+    }
+
+    fetchTicket();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ticketId]);
+
+  async function refreshTicket() {
     const res = await fetch(`/api/tickets/${ticketId}`);
+
     if (res.ok) {
       const data = await res.json();
       setTicket(data.ticket);
@@ -40,22 +68,23 @@ export default function TicketThread({ ticketId, isStaff }: { ticketId: string; 
     }
   }
 
-  useEffect(() => {
-    load();
-  }, [ticketId]);
-
   async function sendReply(e: React.FormEvent) {
     e.preventDefault();
+
     if (!reply.trim()) return;
+
     setBusy(true);
+
     await fetch(`/api/tickets/${ticketId}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ body: reply }),
     });
+
     setReply("");
     setBusy(false);
-    load();
+
+    await refreshTicket();
   }
 
   async function updateStatus(status: string) {
@@ -64,16 +93,28 @@ export default function TicketThread({ ticketId, isStaff }: { ticketId: string; 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
-    load();
+
+    await refreshTicket();
   }
 
-  if (!ticket) return <p className="text-slate">جاري التحميل...</p>;
+  if (!ticket) {
+    return <p className="text-slate">جاري التحميل...</p>;
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl text-ink">{ticket.subject}</h1>
-        <Badge tone={ticket.status === "RESOLVED" || ticket.status === "CLOSED" ? "neutral" : "gain"}>
+        <h1 className="font-display text-2xl text-ink">
+          {ticket.subject}
+        </h1>
+
+        <Badge
+          tone={
+            ticket.status === "RESOLVED" || ticket.status === "CLOSED"
+              ? "neutral"
+              : "gain"
+          }
+        >
           {STATUS_LABELS[ticket.status] || ticket.status}
         </Badge>
       </div>
@@ -85,7 +126,9 @@ export default function TicketThread({ ticketId, isStaff }: { ticketId: string; 
               key={s}
               onClick={() => updateStatus(s)}
               className={`text-xs px-2 py-1 rounded-sm border ${
-                ticket.status === s ? "border-gold text-gold" : "border-line text-slate"
+                ticket.status === s
+                  ? "border-gold text-gold"
+                  : "border-line text-slate"
               }`}
             >
               {STATUS_LABELS[s] || s}
@@ -96,20 +139,36 @@ export default function TicketThread({ ticketId, isStaff }: { ticketId: string; 
 
       <div className="space-y-4 mb-6">
         {messages.map((m) => (
-          <div key={m.id} className="rounded-sm border border-line bg-white p-4">
+          <div
+            key={m.id}
+            className="rounded-sm border border-line bg-white p-4"
+          >
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-medium text-ink">
-                {m.authorName} {m.authorRole !== "CUSTOMER" && <Badge tone="gold">فريق الدعم</Badge>}
+                {m.authorName}{" "}
+                {m.authorRole !== "CUSTOMER" && (
+                  <Badge tone="gold">فريق الدعم</Badge>
+                )}
               </span>
-              <span className="text-xs text-slate">{formatDate(m.createdAt)}</span>
+
+              <span className="text-xs text-slate">
+                {formatDate(m.createdAt)}
+              </span>
             </div>
+
             <p className="text-sm text-ink/90">{m.body}</p>
           </div>
         ))}
       </div>
 
       <form onSubmit={sendReply} className="space-y-2">
-        <Textarea rows={3} placeholder="اكتب ردًا..." value={reply} onChange={(e) => setReply(e.target.value)} />
+        <Textarea
+          rows={3}
+          placeholder="اكتب ردًا..."
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+        />
+
         <Button type="submit" disabled={busy}>
           {busy ? "جاري الإرسال..." : "إرسال الرد"}
         </Button>

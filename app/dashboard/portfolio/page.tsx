@@ -28,15 +28,32 @@ export default function PortfolioPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ stockId: "", quantity: "", avgBuyPrice: "" });
 
-  async function load() {
-    const [pRes, sRes] = await Promise.all([fetch("/api/portfolio"), fetch("/api/stocks")]);
-    if (pRes.ok) setRows(await pRes.json());
-    if (sRes.ok) setStocks(await sRes.json());
-  }
+
 
   useEffect(() => {
-    load();
-  }, []);
+  let cancelled = false;
+
+  async function fetchPortfolio() {
+    const [pRes, sRes] = await Promise.all([
+      fetch("/api/portfolio"),
+      fetch("/api/stocks"),
+    ]);
+
+    if (pRes.ok && !cancelled) {
+      setRows(await pRes.json());
+    }
+
+    if (sRes.ok && !cancelled) {
+      setStocks(await sRes.json());
+    }
+  }
+
+  fetchPortfolio();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
 
   async function addPosition(e: React.FormEvent) {
     e.preventDefault();
@@ -51,8 +68,18 @@ export default function PortfolioPage() {
     });
     setShowForm(false);
     setForm({ stockId: "", quantity: "", avgBuyPrice: "" });
-    load();
-  }
+const [pRes, sRes] = await Promise.all([
+  fetch("/api/portfolio"),
+  fetch("/api/stocks"),
+]);
+
+if (pRes.ok) {
+  setRows(await pRes.json());
+}
+
+if (sRes.ok) {
+  setStocks(await sRes.json());
+}  }
 
   async function remove(id: string) {
     setRows((r) => r?.filter((row) => row.id !== id) || null);

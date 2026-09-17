@@ -28,14 +28,25 @@ export default function SupportPage() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function load() {
-    const res = await fetch("/api/tickets");
-    if (res.ok) setTickets(await res.json());
-  }
+
 
   useEffect(() => {
-    load();
-  }, []);
+  let cancelled = false;
+
+  async function fetchTickets() {
+    const res = await fetch("/api/tickets");
+
+    if (res.ok && !cancelled) {
+      setTickets(await res.json());
+    }
+  }
+
+  fetchTickets();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,7 +60,11 @@ export default function SupportPage() {
     setShowForm(false);
     setSubject("");
     setMessage("");
-    load();
+    const res = await fetch("/api/tickets");
+
+if (res.ok) {
+  setTickets(await res.json());
+}
   }
 
   if (tickets === null) return <p className="text-slate">جاري التحميل...</p>;

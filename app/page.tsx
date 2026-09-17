@@ -3,6 +3,7 @@ import { ArrowLeft, LineChart, ShieldCheck, Newspaper } from "lucide-react";
 import { SectionHeading, Button } from "@/components/ui/primitives";
 import StockCard from "@/components/site/stock-card";
 import { NewsCard, RecommendationCard } from "@/components/site/cards";
+import { db, schema } from "@/db";
 import {
   getTrendingStocks,
   getLatestNews,
@@ -10,11 +11,20 @@ import {
 } from "@/lib/data";
 
 export default async function HomePage() {
-  const [stocks, news, recs] = await Promise.all([
+  const [stocks, news, recs, settingsRows] = await Promise.all([
     getTrendingStocks(6),
     getLatestNews(3),
     getLatestRecommendations(3),
+    db.select().from(schema.siteSettings),
   ]);
+
+  const settings = Object.fromEntries(settingsRows.map((r) => [r.key, r.value]));
+  const stats = [
+    { label: "عملاء نشطون", value: settings.stat_users },
+    { label: "توصية منشورة", value: settings.stat_recommendations },
+    { label: "تنبيه سعري مُرسَل", value: settings.stat_alerts_sent },
+    { label: "دقة التوصيات", value: settings.stat_accuracy, suffix: "%" },
+  ].filter((s) => s.value && s.value !== "0");
 
   return (
     <div>
@@ -30,9 +40,9 @@ export default async function HomePage() {
               تداول السعودية (تاسي) والأسواق الأمريكية، في منصة واحدة.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/register">
+              <Link href="/trial">
                 <Button variant="primary" className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 text-base">
-                  ابدأ مجانًا
+                  جرّب مجانًا
                 </Button>
               </Link>
               <Link href="/markets">
@@ -72,6 +82,23 @@ export default async function HomePage() {
         ))}
       </section>
 
+      {/* Stats (admin-editable) */}
+      {stats.length > 0 && (
+        <section className="border-y border-line bg-paper-dim">
+          <div className="mx-auto max-w-6xl px-4 py-10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {stats.map((s) => (
+              <div key={s.label}>
+                <div className="font-display text-3xl text-ink">
+                  {s.value}
+                  {s.suffix || "+"}
+                </div>
+                <div className="text-sm text-slate mt-1">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Trending stocks */}
       <section className="mx-auto max-w-6xl px-4 py-12">
         <SectionHeading
@@ -101,8 +128,15 @@ export default async function HomePage() {
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {recs.map((r) => (
-            <RecommendationCard key={r.id} rec={r} />
-          ))}
+  <RecommendationCard
+    key={r.id}
+    rec={{
+      ...r,
+      stockSymbol: r.stockSymbol ?? "",
+      stockName: r.stockName ?? "",
+    }}
+  />
+))}
         </div>
       </section>
 

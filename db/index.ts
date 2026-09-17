@@ -3,7 +3,6 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";
 
 declare global {
-  // eslint-disable-next-line no-var
   var __pg__: ReturnType<typeof postgres> | undefined;
 }
 

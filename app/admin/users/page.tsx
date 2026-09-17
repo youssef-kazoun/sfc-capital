@@ -16,14 +16,24 @@ interface UserRow {
 export default function AdminUsersPage() {
   const [rows, setRows] = useState<UserRow[] | null>(null);
 
-  async function load() {
-    const res = await fetch("/api/admin/users");
-    if (res.ok) setRows(await res.json());
-  }
 
   useEffect(() => {
-    load();
-  }, []);
+  let cancelled = false;
+
+  async function fetchUsers() {
+    const res = await fetch("/api/admin/users");
+
+    if (res.ok && !cancelled) {
+      setRows(await res.json());
+    }
+  }
+
+  fetchUsers();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
 
   async function updateRole(id: string, role: string) {
     setRows((r) => r?.map((u) => (u.id === id ? { ...u, role } : u)) || null);

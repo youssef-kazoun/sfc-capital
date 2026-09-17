@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/primitives";
 import { formatDate } from "@/lib/utils";
 
+type BadgeTone = "gain" | "loss" | "neutral";
+
 export function NewsCard({
   article,
 }: {
@@ -20,12 +22,21 @@ export function NewsCard({
     >
       <div className="flex items-center gap-2 mb-2">
         <Badge tone="gold">{article.category}</Badge>
+
         {article.publishedAt && (
-          <span className="text-xs text-slate">{formatDate(article.publishedAt)}</span>
+          <span className="text-xs text-slate">
+            {formatDate(article.publishedAt)}
+          </span>
         )}
       </div>
-      <h3 className="font-display text-lg text-ink leading-snug">{article.title}</h3>
-      <p className="text-sm text-slate mt-2 line-clamp-2">{article.excerpt}</p>
+
+      <h3 className="font-display text-lg text-ink leading-snug">
+        {article.title}
+      </h3>
+
+      <p className="text-sm text-slate mt-2 line-clamp-2">
+        {article.excerpt}
+      </p>
     </Link>
   );
 }
@@ -65,12 +76,12 @@ export function RecommendationCard({
     stockName: string;
   };
 }) {
-  const tone =
+  const tone: BadgeTone =
     rec.action === "BUY" || rec.action === "ACCUMULATE"
       ? "gain"
       : rec.action === "SELL" || rec.action === "REDUCE"
-      ? "loss"
-      : "neutral";
+        ? "loss"
+        : "neutral";
 
   return (
     <Link
@@ -79,28 +90,53 @@ export function RecommendationCard({
     >
       <div className="flex items-center justify-between mb-3">
         <div>
-          <div className="font-mono text-xs text-slate">{rec.stockSymbol}</div>
-          <div className="font-medium text-ink">{rec.stockName}</div>
+          <div className="font-mono text-xs text-slate">
+            {rec.stockSymbol}
+          </div>
+
+          <div className="font-medium text-ink">
+            {rec.stockName}
+          </div>
         </div>
-        <Badge tone={tone as any}>{ACTION_LABELS[rec.action] || rec.action}</Badge>
+
+        <Badge tone={tone}>
+          {ACTION_LABELS[rec.action] || rec.action}
+        </Badge>
       </div>
+
       <div className="grid grid-cols-3 gap-2 text-center text-xs">
         <div>
           <div className="text-slate">الدخول</div>
-          <div className="font-mono font-medium text-ink">{rec.entryPrice}</div>
+          <div className="font-mono font-medium text-ink">
+            {rec.entryPrice}
+          </div>
         </div>
+
         <div>
           <div className="text-slate">الهدف</div>
-          <div className="font-mono font-medium text-gain">{rec.targetPrice}</div>
+          <div className="font-mono font-medium text-gain">
+            {rec.targetPrice}
+          </div>
         </div>
+
         <div>
           <div className="text-slate">وقف الخسارة</div>
-          <div className="font-mono font-medium text-loss">{rec.stopLoss}</div>
+          <div className="font-mono font-medium text-loss">
+            {rec.stopLoss}
+          </div>
         </div>
       </div>
+
       <div className="mt-3 flex items-center justify-between">
-        <Badge>مخاطرة {RISK_LABELS[rec.riskLevel] || rec.riskLevel}</Badge>
-        <Badge tone={rec.status === "OPEN" ? "gain" : "neutral"}>{STATUS_LABELS[rec.status] || rec.status}</Badge>
+        <Badge>
+          مخاطرة {RISK_LABELS[rec.riskLevel] || rec.riskLevel}
+        </Badge>
+
+        <Badge
+          tone={rec.status === "OPEN" ? "gain" : "neutral"}
+        >
+          {STATUS_LABELS[rec.status] || rec.status}
+        </Badge>
       </div>
     </Link>
   );

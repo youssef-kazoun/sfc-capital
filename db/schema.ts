@@ -48,6 +48,11 @@ export const stocks = pgTable("stocks", {
   changePct: real("change_pct").notNull().default(0),
   volume: integer("volume").notNull().default(0),
   marketCap: real("market_cap"),
+  // Shariah screening inputs (approximate, ratio-based — see lib/shariah.ts)
+  isConventionalFinance: boolean("is_conventional_finance").notNull().default(false),
+  debtRatio: real("debt_ratio"), // interest-bearing debt / market cap, %
+  cashRatio: real("cash_ratio"), // cash + interest-bearing securities / market cap, %
+  nonCompliantIncomeRatio: real("non_compliant_income_ratio"), // % of revenue
   ...timestamps,
 });
 
@@ -75,6 +80,7 @@ export const newsArticles = pgTable("news_articles", {
   content: text("content").notNull(),
   coverImage: text("cover_image"),
   category: text("category").notNull().default("General"),
+  market: text("market"), // "SAUDI" | "US" | null (general/global)
   published: boolean("published").notNull().default(false),
   publishedAt: text("published_at"),
   authorId: text("author_id")
@@ -282,6 +288,22 @@ export const contactSubmissions = pgTable("contact_submissions", {
   message: text("message").notNull(),
   userId: text("user_id").references(() => users.id),
   handled: boolean("handled").notNull().default(false),
+  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+});
+
+export const trialRequests = pgTable("trial_requests", {
+  id: id(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  serviceType: text("service_type").notNull(),
+  market: text("market").notNull(), // "SAUDI" | "US"
+  liquiditySize: text("liquidity_size"),
+  currency: text("currency"),
+  status: text("status", { enum: ["NEW", "CONTACTED", "CONVERTED", "CLOSED"] })
+    .notNull()
+    .default("NEW"),
+  userId: text("user_id").references(() => users.id),
   createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
 });
 

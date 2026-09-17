@@ -19,11 +19,20 @@ export interface PaymentProvider {
  * adapter here once credentials exist (PAYMENT_API_KEY / PAYMENT_API_SECRET).
  */
 class MockPaymentProvider implements PaymentProvider {
-  async charge({ amount, currency }: { amount: number; currency: string; description: string }): Promise<ChargeResult> {
+  async charge(params: {
+    amount: number;
+    currency: string;
+    description: string;
+  }): Promise<ChargeResult> {
     await new Promise((r) => setTimeout(r, 300));
+
+    const { amount, currency } = params;
+
     return {
       success: true,
-      providerRef: `mock_${Date.now()}_${Math.floor(Math.random() * 1e6)}`,
+      providerRef: `mock_${currency}_${amount}_${Date.now()}_${Math.floor(
+        Math.random() * 1e6
+      )}`,
       status: "SUCCEEDED",
     };
   }

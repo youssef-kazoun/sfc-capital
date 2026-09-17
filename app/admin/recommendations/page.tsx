@@ -33,23 +33,41 @@ const STATUS_LABELS: Record<string, string> = {
 export default function AdminRecommendationsPage() {
   const [rows, setRows] = useState<RecRow[] | null>(null);
 
-  async function load() {
-    const res = await fetch("/api/admin/recommendations");
-    if (res.ok) setRows(await res.json());
-  }
+
 
   useEffect(() => {
-    load();
-  }, []);
+  let cancelled = false;
+
+  async function fetchRecommendations() {
+    const res = await fetch("/api/admin/recommendations");
+
+    if (res.ok && !cancelled) {
+      setRows(await res.json());
+    }
+  }
+
+  fetchRecommendations();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
 
   async function closeRec(id: string) {
-    await fetch(`/api/admin/recommendations/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "CLOSED" }),
-    });
-    load();
+  const res = await fetch(`/api/admin/recommendations/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status: "CLOSED" }),
+  });
+
+  if (res.ok) {
+    setRows((currentRows) =>
+      currentRows?.map((row) =>
+        row.id === id ? { ...row, status: "CLOSED" } : row
+      ) || null
+    );
   }
+}
 
   async function remove(id: string) {
     if (!confirm("حذف هذه التوصية؟")) return;

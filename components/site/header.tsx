@@ -13,10 +13,10 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   const links = [
+    { href: "/services", label: "خدماتنا" },
     { href: "/markets", label: t.nav.markets },
     { href: "/news", label: t.nav.news },
     { href: "/recommendations", label: t.nav.recommendations },
-    { href: "/analysis", label: t.nav.analysis },
     { href: "/calculators", label: t.nav.calculators },
     { href: "/packages", label: t.nav.packages },
   ];
@@ -43,6 +43,12 @@ export default function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">
+            <Link
+              href="/trial"
+              className="rounded-sm bg-gold px-3 py-1.5 text-sm font-medium text-ink hover:bg-gold-bright transition-colors"
+            >
+              جرّبها مجانًا
+            </Link>
             <LanguageSwitcher />
             {session?.user ? (
               <>
@@ -86,6 +92,9 @@ export default function Header() {
                 {l.label}
               </Link>
             ))}
+            <Link href="/trial" onClick={() => setOpen(false)} className="text-sm font-medium text-gold">
+              جرّبها مجانًا
+            </Link>
             <div className="flex items-center justify-between pt-3 border-t border-line">
               <LanguageSwitcher />
               {session?.user ? (

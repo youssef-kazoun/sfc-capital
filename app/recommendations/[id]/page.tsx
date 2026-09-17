@@ -34,13 +34,12 @@ export default async function RecommendationDetailPage({
   if (!data || !data.stock) notFound();
 
   const { rec, stock, updates, author } = data;
-  const tone =
-    rec.action === "BUY" || rec.action === "ACCUMULATE"
-      ? "gain"
-      : rec.action === "SELL" || rec.action === "REDUCE"
-      ? "loss"
-      : "neutral";
-
+  const tone: "gain" | "loss" | "neutral" =
+  rec.action === "BUY" || rec.action === "ACCUMULATE"
+    ? "gain"
+    : rec.action === "SELL" || rec.action === "REDUCE"
+    ? "loss"
+    : "neutral";
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
       <Link href={`/stocks/${stock.symbol}`} className="font-mono text-xs text-slate hover:text-gold">
@@ -48,7 +47,7 @@ export default async function RecommendationDetailPage({
       </Link>
       <div className="flex items-center gap-3 mt-1">
         <h1 className="font-display text-2xl text-ink">{stock.name}</h1>
-        <Badge tone={tone as any}>{ACTION_LABELS[rec.action] || rec.action}</Badge>
+        <Badge tone={tone}>{ACTION_LABELS[rec.action] || rec.action}</Badge>
         <Badge tone={rec.status === "OPEN" ? "gain" : "neutral"}>{STATUS_LABELS[rec.status] || rec.status}</Badge>
       </div>
 
