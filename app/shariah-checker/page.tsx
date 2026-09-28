@@ -3,13 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import {
-  Card,
-  Select,
-  Badge,
-  SectionHeading,
-  Button,
-} from "@/components/ui/primitives";
+import { Card, Select, Badge, SectionHeading, Button } from "@/components/ui/primitives";
 import { ShieldCheck, ShieldAlert, ShieldQuestion } from "lucide-react";
 
 interface StockOption {
@@ -26,12 +20,7 @@ interface CheckResult {
   reasons: string[];
 }
 
-type StatusStyle = {
-  icon: typeof ShieldCheck;
-  tone: "gain" | "gold" | "loss" | "neutral";
-};
-
-const STATUS_STYLES: Record<string, StatusStyle> = {
+const STATUS_STYLES: Record<string, { icon: any; tone: "gain" | "gold" | "loss" | "neutral" }> = {
   COMPLIANT: { icon: ShieldCheck, tone: "gain" },
   REVIEW: { icon: ShieldQuestion, tone: "gold" },
   NOT_COMPLIANT: { icon: ShieldAlert, tone: "loss" },
@@ -49,9 +38,8 @@ function ShariahCheckerContent() {
   useEffect(() => {
     fetch("/api/stocks")
       .then((r) => r.json())
-      .then((rows: StockOption[]) => {
+      .then((rows) => {
         setStocks(rows);
-
         if (preselect) {
           setSymbol(preselect);
         } else if (rows[0]) {
@@ -62,15 +50,9 @@ function ShariahCheckerContent() {
 
   async function check() {
     if (!symbol) return;
-
     setBusy(true);
-
     const res = await fetch(`/api/shariah-check?symbol=${symbol}`);
-
-    if (res.ok) {
-      setResult(await res.json());
-    }
-
+    if (res.ok) setResult(await res.json());
     setBusy(false);
   }
 
@@ -88,19 +70,12 @@ function ShariahCheckerContent() {
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[200px]">
             <label className="text-xs text-slate">اختر السهم</label>
-
-            <Select
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value)}
-            >
+            <Select value={symbol} onChange={(e) => setSymbol(e.target.value)}>
               {stocks.map((s) => (
-                <option key={s.id} value={s.symbol}>
-                  {s.symbol} — {s.name}
-                </option>
+                <option key={s.id} value={s.symbol}>{s.symbol} — {s.name}</option>
               ))}
             </Select>
           </div>
-
           <Button onClick={check} disabled={busy}>
             {busy ? "جاري الفحص..." : "فحص السهم"}
           </Button>
@@ -110,33 +85,16 @@ function ShariahCheckerContent() {
       {result && style && (
         <Card>
           <div className="flex items-center gap-3 mb-4">
-            {Icon && (
-              <Icon
-                className={`h-8 w-8 ${
-                  result.status === "COMPLIANT"
-                    ? "text-gain"
-                    : result.status === "NOT_COMPLIANT"
-                      ? "text-loss"
-                      : "text-gold"
-                }`}
-              />
-            )}
-
+            <Icon className={`h-8 w-8 ${
+              result.status === "COMPLIANT" ? "text-gain" :
+              result.status === "NOT_COMPLIANT" ? "text-loss" : "text-gold"
+            }`} />
             <div>
-              <div className="font-mono text-xs text-slate">
-                {result.symbol}
-              </div>
-
-              <div className="font-display text-lg text-ink">
-                {result.name}
-              </div>
+              <div className="font-mono text-xs text-slate">{result.symbol}</div>
+              <div className="font-display text-lg text-ink">{result.name}</div>
             </div>
-
-            <Badge tone={style.tone}>
-              {result.statusLabel}
-            </Badge>
+            <Badge tone={style.tone} >{result.statusLabel}</Badge>
           </div>
-
           <ul className="space-y-2 text-sm text-ink/80">
             {result.reasons.map((r, i) => (
               <li key={i} className="flex items-start gap-2">

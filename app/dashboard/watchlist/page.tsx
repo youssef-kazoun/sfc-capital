@@ -19,33 +19,23 @@ interface WatchlistRow {
 export default function WatchlistPage() {
   const [rows, setRows] = useState<WatchlistRow[] | null>(null);
 
-
-  useEffect(() => {
-  let cancelled = false;
-
-  async function fetchWatchlist() {
+  async function load() {
     const res = await fetch("/api/watchlist");
-
-    if (res.ok && !cancelled) {
-      setRows(await res.json());
-    }
+    if (res.ok) setRows(await res.json());
   }
 
-  fetchWatchlist();
-
-  return () => {
-    cancelled = true;
-  };
-}, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function remove(id: string) {
-  setRows((r) => r?.filter((row) => row.id !== id) || null);
-  await fetch("/api/watchlist", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id }),
-  });
-}
+    setRows((r) => r?.filter((row) => row.id !== id) || null);
+    await fetch("/api/watchlist", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+  }
 
   if (rows === null) return <p className="text-slate">جاري التحميل...</p>;
 

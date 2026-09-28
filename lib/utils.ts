@@ -36,6 +36,12 @@ export function formatPct(value: number) {
   return `${sign}${value.toFixed(2)}%`;
 }
 
+// Arabic reading speed ~ 180 words/minute for average adult readers.
+export function estimateReadingTime(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 180));
+}
+
 const AR_MONTHS = [
   "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
   "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",

@@ -42,6 +42,18 @@ const OFFERS_FIELD: SettingField = {
   type: "textarea",
 };
 
+const TESTIMONIALS_FIELD: SettingField = {
+  key: "testimonials",
+  label: 'آراء العملاء (JSON — مصفوفة من {"name","role","quote"})',
+  type: "textarea",
+};
+
+const FAQ_FIELD: SettingField = {
+  key: "faq_items",
+  label: 'الأسئلة الشائعة (JSON — مصفوفة من {"question","answer"})',
+  type: "textarea",
+};
+
 export default function AdminSettingsPage() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<string | null>(null);
@@ -122,6 +134,16 @@ export default function AdminSettingsPage() {
       <div>
         <h2 className="font-display text-lg text-ink mb-3">العروض الخاصة</h2>
         <Card className="max-w-lg space-y-4">{renderField(OFFERS_FIELD)}</Card>
+      </div>
+
+      <div>
+        <h2 className="font-display text-lg text-ink mb-3">آراء العملاء</h2>
+        <Card className="max-w-lg space-y-4">{renderField(TESTIMONIALS_FIELD)}</Card>
+      </div>
+
+      <div>
+        <h2 className="font-display text-lg text-ink mb-3">الأسئلة الشائعة</h2>
+        <Card className="max-w-lg space-y-4">{renderField(FAQ_FIELD)}</Card>
       </div>
 
       {status && <p className="text-sm text-gain">{status}</p>}

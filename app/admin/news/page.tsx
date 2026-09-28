@@ -17,22 +17,14 @@ interface NewsRow {
 export default function AdminNewsPage() {
   const [rows, setRows] = useState<NewsRow[] | null>(null);
 
-  useEffect(() => {
-  let cancelled = false;
-
-  async function fetchNews() {
+  async function load() {
     const res = await fetch("/api/admin/news");
-    if (res.ok && !cancelled) {
-      setRows(await res.json());
-    }
+    if (res.ok) setRows(await res.json());
   }
 
-  fetchNews();
-
-  return () => {
-    cancelled = true;
-  };
-}, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function remove(id: string) {
     if (!confirm("حذف هذا المقال؟")) return;

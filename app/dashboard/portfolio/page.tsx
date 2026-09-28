@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button, Input, Select, Card } from "@/components/ui/primitives";
 import { formatCurrency, formatPct } from "@/lib/utils";
 import { X, Plus } from "lucide-react";
+import AllocationChart from "@/components/site/allocation-chart";
 
 interface PortfolioRow {
   id: string;
@@ -13,6 +14,8 @@ interface PortfolioRow {
   name: string;
   lastPrice: number;
   currency: string;
+  sector: string | null;
+  exchange: string;
 }
 interface StockOption {
   id: string;
@@ -28,32 +31,15 @@ export default function PortfolioPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ stockId: "", quantity: "", avgBuyPrice: "" });
 
-
-
-  useEffect(() => {
-  let cancelled = false;
-
-  async function fetchPortfolio() {
-    const [pRes, sRes] = await Promise.all([
-      fetch("/api/portfolio"),
-      fetch("/api/stocks"),
-    ]);
-
-    if (pRes.ok && !cancelled) {
-      setRows(await pRes.json());
-    }
-
-    if (sRes.ok && !cancelled) {
-      setStocks(await sRes.json());
-    }
+  async function load() {
+    const [pRes, sRes] = await Promise.all([fetch("/api/portfolio"), fetch("/api/stocks")]);
+    if (pRes.ok) setRows(await pRes.json());
+    if (sRes.ok) setStocks(await sRes.json());
   }
 
-  fetchPortfolio();
-
-  return () => {
-    cancelled = true;
-  };
-}, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function addPosition(e: React.FormEvent) {
     e.preventDefault();
@@ -68,18 +54,8 @@ export default function PortfolioPage() {
     });
     setShowForm(false);
     setForm({ stockId: "", quantity: "", avgBuyPrice: "" });
-const [pRes, sRes] = await Promise.all([
-  fetch("/api/portfolio"),
-  fetch("/api/stocks"),
-]);
-
-if (pRes.ok) {
-  setRows(await pRes.json());
-}
-
-if (sRes.ok) {
-  setStocks(await sRes.json());
-}  }
+    load();
+  }
 
   async function remove(id: string) {
     setRows((r) => r?.filter((row) => row.id !== id) || null);
@@ -96,6 +72,24 @@ if (sRes.ok) {
   const totalCost = rows.reduce((sum, r) => sum + r.quantity * r.avgBuyPrice, 0);
   const totalPnlPct = totalCost ? ((totalValue - totalCost) / totalCost) * 100 : 0;
 
+  const sectorMap = new Map<string, number>();
+  const marketMap = new Map<string, number>();
+  for (const r of rows) {
+    const value = r.quantity * r.lastPrice;
+    const sector = r.sector || "أخرى";
+    const market = r.exchange === "TADAWUL" ? "السوق السعودي" : "السوق الأمريكي";
+    sectorMap.set(sector, (sectorMap.get(sector) || 0) + value);
+    marketMap.set(market, (marketMap.get(market) || 0) + value);
+  }
+  const sectorData = Array.from(sectorMap.entries()).map(([name, value]) => ({
+    name,
+    value: totalValue ? (value / totalValue) * 100 : 0,
+  }));
+  const marketData = Array.from(marketMap.entries()).map(([name, value]) => ({
+    name,
+    value: totalValue ? (value / totalValue) * 100 : 0,
+  }));
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -110,6 +104,19 @@ if (sRes.ok) {
           <Card><div className="text-xs text-slate">القيمة الإجمالية</div><div className="font-display text-xl mt-1">{formatCurrency(totalValue, rows[0]?.currency || "USD")}</div></Card>
           <Card><div className="text-xs text-slate">التكلفة الإجمالية</div><div className="font-display text-xl mt-1">{formatCurrency(totalCost, rows[0]?.currency || "USD")}</div></Card>
           <Card><div className="text-xs text-slate">الربح/الخسارة غير المحققة</div><div className={`font-display text-xl mt-1 ${totalPnlPct >= 0 ? "text-gain" : "text-loss"}`}>{formatPct(totalPnlPct)}</div></Card>
+        </div>
+      )}
+
+      {rows.length > 0 && (
+        <div className="grid sm:grid-cols-2 gap-4 mb-6">
+          <Card>
+            <h3 className="text-sm font-medium text-ink mb-2">التوزيع حسب القطاع</h3>
+            <AllocationChart data={sectorData} />
+          </Card>
+          <Card>
+            <h3 className="text-sm font-medium text-ink mb-2">التوزيع حسب السوق</h3>
+            <AllocationChart data={marketData} />
+          </Card>
         </div>
       )}
 

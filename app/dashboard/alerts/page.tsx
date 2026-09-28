@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/primitives";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { X } from "lucide-react";
 
 interface AlertRow {
@@ -20,25 +20,14 @@ interface AlertRow {
 export default function AlertsPage() {
   const [rows, setRows] = useState<AlertRow[] | null>(null);
 
-
-
-  useEffect(() => {
-  let cancelled = false;
-
-  async function fetchAlerts() {
+  async function load() {
     const res = await fetch("/api/alerts");
-
-    if (res.ok && !cancelled) {
-      setRows(await res.json());
-    }
+    if (res.ok) setRows(await res.json());
   }
 
-  fetchAlerts();
-
-  return () => {
-    cancelled = true;
-  };
-}, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function remove(id: string) {
     setRows((r) => r?.filter((row) => row.id !== id) || null);

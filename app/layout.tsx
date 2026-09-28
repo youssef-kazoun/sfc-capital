@@ -6,10 +6,31 @@ import Header from "@/components/site/header";
 import Footer from "@/components/site/footer";
 import type { Locale } from "@/lib/i18n/context";
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "SFC Capital — الأسواق السعودية والأمريكية",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "SFC Capital — الأسواق السعودية والأمريكية",
+    template: "%s | SFC Capital",
+  },
   description:
     "أسعار لحظية، توصيات من خبراء، وأدوات لإدارة المحفظة للأسواق السعودية والأمريكية.",
+  openGraph: {
+    title: "SFC Capital",
+    description:
+      "أسعار لحظية، توصيات من خبراء، وأدوات لإدارة المحفظة للأسواق السعودية والأمريكية.",
+    url: siteUrl,
+    siteName: "SFC Capital",
+    locale: "ar_SA",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "SFC Capital",
+    description:
+      "أسعار لحظية، توصيات من خبراء، وأدوات لإدارة المحفظة للأسواق السعودية والأمريكية.",
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

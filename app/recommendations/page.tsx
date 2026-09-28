@@ -26,15 +26,8 @@ export default async function RecommendationsPage({
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {recs.map((r) => (
-  <RecommendationCard
-    key={r.id}
-    rec={{
-      ...r,
-      stockSymbol: r.stockSymbol ?? "",
-      stockName: r.stockName ?? "",
-    }}
-  />
-))}
+            <RecommendationCard key={r.id} rec={r} />
+          ))}
         </div>
       )}
     </div>

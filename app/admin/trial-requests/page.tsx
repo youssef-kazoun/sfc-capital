@@ -32,24 +32,14 @@ const MARKET_LABELS: Record<string, string> = {
 export default function AdminTrialRequestsPage() {
   const [rows, setRows] = useState<TrialRow[] | null>(null);
 
-  
-  useEffect(() => {
-  let cancelled = false;
-
-  async function fetchTrialRequests() {
+  async function load() {
     const res = await fetch("/api/admin/trial-requests");
-
-    if (res.ok && !cancelled) {
-      setRows(await res.json());
-    }
+    if (res.ok) setRows(await res.json());
   }
 
-  fetchTrialRequests();
-
-  return () => {
-    cancelled = true;
-  };
-}, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function updateStatus(id: string, status: string) {
     setRows((r) => r?.map((row) => (row.id === id ? { ...row, status } : row)) || null);

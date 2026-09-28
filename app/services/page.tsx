@@ -2,10 +2,17 @@ import Link from "next/link";
 import { SectionHeading, Button } from "@/components/ui/primitives";
 import {
   TrendingUp, Newspaper, Package, Calculator, ShieldCheck, Percent,
-  BookOpen, FileText, Gift,
+  BookOpen, FileText, Gift, BarChart3, HelpCircle, Sparkles,
 } from "lucide-react";
 
 const services = [
+  {
+    icon: BarChart3,
+    title: "نظرة عامة على السوق",
+    body: "الأسهم الأكثر ارتفاعًا وانخفاضًا وتداولًا، وأداء القطاعات في نظرة واحدة.",
+    href: "/market-overview",
+    cta: "استعرض السوق",
+  },
   {
     icon: TrendingUp,
     title: "توصيات السوق السعودي",
@@ -82,6 +89,20 @@ const services = [
     body: "جرّب خدماتنا مجانًا لفترة محدودة قبل الاشتراك في أي باقة.",
     href: "/trial",
     cta: "سجّل الآن",
+  },
+  {
+    icon: HelpCircle,
+    title: "الأسئلة الشائعة",
+    body: "إجابات سريعة على أكثر الأسئلة تكرارًا حول المنصة والاشتراكات.",
+    href: "/faq",
+    cta: "تصفّح الأسئلة",
+  },
+  {
+    icon: Sparkles,
+    title: "المساعد الذكي",
+    body: "مساعد يجيب على أسئلتك حول التداول والتحليل داخل المنصة (قريبًا).",
+    href: "/ai-assistant",
+    cta: "تعرّف عليه",
   },
 ];
 

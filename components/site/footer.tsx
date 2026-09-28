@@ -56,10 +56,12 @@ export default async function Footer() {
           <ul className="space-y-2 text-sm text-paper/60">
             <li><Link href="/services" className="hover:text-gold">خدماتنا</Link></li>
             <li><Link href="/markets" className="hover:text-gold">الأسواق</Link></li>
+            <li><Link href="/market-overview" className="hover:text-gold">نظرة عامة على السوق</Link></li>
             <li><Link href="/recommendations" className="hover:text-gold">التوصيات</Link></li>
             <li><Link href="/analysis" className="hover:text-gold">التحليلات</Link></li>
             <li><Link href="/calculators" className="hover:text-gold">الحاسبات</Link></li>
             <li><Link href="/shariah-checker" className="hover:text-gold">فحص شرعية السهم</Link></li>
+            <li><Link href="/faq" className="hover:text-gold">الأسئلة الشائعة</Link></li>
           </ul>
         </div>
         <div>

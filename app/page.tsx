@@ -3,6 +3,7 @@ import { ArrowLeft, LineChart, ShieldCheck, Newspaper } from "lucide-react";
 import { SectionHeading, Button } from "@/components/ui/primitives";
 import StockCard from "@/components/site/stock-card";
 import { NewsCard, RecommendationCard } from "@/components/site/cards";
+import TestimonialsSection from "@/components/site/testimonials-section";
 import { db, schema } from "@/db";
 import {
   getTrendingStocks,
@@ -25,6 +26,13 @@ export default async function HomePage() {
     { label: "تنبيه سعري مُرسَل", value: settings.stat_alerts_sent },
     { label: "دقة التوصيات", value: settings.stat_accuracy, suffix: "%" },
   ].filter((s) => s.value && s.value !== "0");
+
+  let testimonials: { name: string; role?: string; quote: string }[] = [];
+  try {
+    testimonials = JSON.parse(settings.testimonials || "[]");
+  } catch {
+    testimonials = [];
+  }
 
   return (
     <div>
@@ -128,15 +136,8 @@ export default async function HomePage() {
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {recs.map((r) => (
-  <RecommendationCard
-    key={r.id}
-    rec={{
-      ...r,
-      stockSymbol: r.stockSymbol ?? "",
-      stockName: r.stockName ?? "",
-    }}
-  />
-))}
+            <RecommendationCard key={r.id} rec={r} />
+          ))}
         </div>
       </section>
 
@@ -154,6 +155,23 @@ export default async function HomePage() {
           {news.map((n) => (
             <NewsCard key={n.id} article={n} />
           ))}
+        </div>
+      </section>
+      <TestimonialsSection testimonials={testimonials} />
+
+      {/* FAQ CTA */}
+      <section className="mx-auto max-w-6xl px-4 pb-20">
+        <div className="rounded-sm border border-line bg-paper-dim p-8 text-center">
+          <h2 className="font-display text-xl text-ink mb-2">عندك سؤال؟</h2>
+          <p className="text-sm text-slate mb-4">تصفّح الأسئلة الشائعة أو تواصل معنا مباشرة.</p>
+          <div className="flex justify-center gap-3">
+            <Link href="/faq">
+              <Button variant="secondary">الأسئلة الشائعة</Button>
+            </Link>
+            <Link href="/contact">
+              <Button variant="ghost">تواصل معنا</Button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>
