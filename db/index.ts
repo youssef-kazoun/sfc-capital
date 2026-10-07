@@ -16,7 +16,8 @@ const client =
   global.__pg__ ??
   postgres(process.env.DATABASE_URL, {
     ssl: process.env.DATABASE_URL.includes("localhost") ? false : "require",
-    max: 10,
+    max: 1,
+    connect_timeout: 20,
   });
 
 if (process.env.NODE_ENV !== "production") global.__pg__ = client;

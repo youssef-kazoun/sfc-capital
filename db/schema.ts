@@ -210,6 +210,11 @@ export const packages = pgTable("packages", {
   description: text("description").notNull(),
   priceMonthly: real("price_monthly").notNull(),
   priceYearly: real("price_yearly").notNull(),
+  // Actual charge amounts in SAR — Moyasar settles to Saudi bank accounts in
+  // SAR only. priceMonthly/priceYearly above remain the display price (e.g.
+  // in USD for the site's dual-market framing); these are what gets charged.
+  priceMonthlySar: real("price_monthly_sar"),
+  priceYearlySar: real("price_yearly_sar"),
   features: text("features").notNull(), // JSON-encoded string array
   isActive: boolean("is_active").notNull().default(true),
   createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
@@ -247,6 +252,7 @@ export const payments = pgTable("payments", {
     .default("PENDING"),
   provider: text("provider").notNull().default("mock"),
   providerRef: text("provider_ref"),
+  moyasarPaymentId: text("moyasar_payment_id"),
   createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
 });
 

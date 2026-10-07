@@ -278,6 +278,8 @@ async function main() {
       description: "خلاصة كاملة للتوصيات وأدوات إدارة المحفظة للمستثمر النشط.",
       priceMonthly: 29,
       priceYearly: 290,
+      priceMonthlySar: 109,
+      priceYearlySar: 1090,
       features: JSON.stringify([
         "كل ما في الباقة الأساسية",
         "خلاصة كاملة لتوصيات المحللين",
@@ -292,6 +294,8 @@ async function main() {
       description: "أولوية الوصول للبحث ودعم مخصص للمتداولين الجادين.",
       priceMonthly: 79,
       priceYearly: 790,
+      priceMonthlySar: 299,
+      priceYearlySar: 2990,
       features: JSON.stringify([
         "كل ما في الباقة الاحترافية",
         "وصول مبكر للتوصيات الجديدة",

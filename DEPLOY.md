@@ -115,3 +115,70 @@ gcloud run deploy sfc-capital --image us-central1-docker.pkg.dev/YOUR_PROJECT_ID
   tier deploys this same Next.js app with zero Docker/gcloud steps — connect
   your GitHub repo, set the same environment variables, done. Not "Google",
   but truly card-free.
+
+## Taking real payments (Moyasar — settles to a Saudi bank account)
+
+Stripe does **not** support Saudi Arabia as a settlement country — a Stripe
+account would pay out to a foreign (US/UK) bank account, not a local Saudi
+one. For real riyals landing in a real Saudi bank account, use a
+SAMA-licensed Saudi gateway. This app is wired for **Moyasar**
+(moyasar.com), chosen for its low fees, fast settlement (next-day for Mada),
+and simple API — but the same pattern (`services/payments/moyasar.ts`)
+would work similarly for Tap Payments or HyperPay if you prefer one of
+those instead.
+
+### 1. Sign up with Moyasar
+
+1. Go to https://moyasar.com and create a merchant account.
+2. You'll need either a **Commercial Registration (CR)** or, if you're an
+   individual/freelancer, a **Watheeq freelance certificate** — both are
+   acceptable for Moyasar onboarding.
+3. Add your **Saudi IBAN** (bank account) during onboarding — this is where
+   settled funds are paid out.
+4. Once approved, go to Dashboard → Developers → API Keys. You'll see a
+   **test** key pair and (after your account is fully verified) a **live**
+   key pair. Each pair has a `sk_` (secret) and `pk_` (publishable) key.
+
+### 2. Set environment variables
+
+In Vercel (or your `.env` locally), set:
+
+```
+MOYASAR_SECRET_KEY=sk_live_xxxxxxxx
+MOYASAR_PUBLISHABLE_KEY=pk_live_xxxxxxxx
+```
+
+Use the `sk_test_` / `pk_test_` pair first and test with
+[Moyasar's test cards](https://docs.moyasar.com/testing) before switching to
+live keys. Leaving both empty makes the app fall back to the built-in mock
+payment flow (useful for local development without touching real money).
+
+### 3. Set real SAR prices for each package
+
+Moyasar only charges in SAR. Go to `/admin/packages` on your deployed site
+and fill in the **"السعر بالريال السعودي — فعلي"** fields for each paid
+package — this is the amount that actually gets charged. The USD fields
+stay as the display price shown to visitors; they're cosmetic and don't
+affect what's charged.
+
+### 4. How the checkout flow works
+
+1. User clicks **Subscribe** on `/packages` → `/api/checkout` creates a
+   `PENDING` subscription and redirects to `/checkout/[id]`.
+2. That page embeds Moyasar's own hosted **Payment Form** widget — card
+   numbers go straight to Moyasar, never through this app's server.
+3. Moyasar redirects back to the same page with a `?id=<payment_id>` query
+   param. The app calls `/api/checkout/verify`, which fetches that payment
+   from Moyasar's API **server-side** using the secret key and checks it's
+   actually `paid` with the right amount and currency before marking the
+   subscription `ACTIVE`. The client-side redirect is never trusted alone.
+
+### 5. What's not built yet
+
+Moyasar's card flow is a one-time charge per checkout, not a native
+recurring-billing product (unlike Stripe Subscriptions). This integration
+charges once per billing cycle selected at checkout; it does **not**
+automatically re-charge the customer when that cycle ends. For true
+auto-renewal, you'd add a scheduled job (e.g. a Vercel Cron Job) that
+re-charges a saved card token via Moyasar's token-payment API a few days
+before `endsAt` — happy to build that next if you want it.

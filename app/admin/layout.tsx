@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth-guard";
-import { LayoutDashboard, Newspaper, TrendingUp, Users, Settings, LifeBuoy, UserPlus, LineChart } from "lucide-react";
+import { LayoutDashboard, Newspaper, TrendingUp, Users, Settings, LifeBuoy, UserPlus, LineChart, Package } from "lucide-react";
 
 const links = [
   { href: "/admin", label: "نظرة عامة", icon: LayoutDashboard },
   { href: "/admin/stocks", label: "الأسهم", icon: LineChart },
+  { href: "/admin/packages", label: "الباقات والأسعار", icon: Package },
   { href: "/admin/news", label: "الأخبار", icon: Newspaper },
   { href: "/admin/recommendations", label: "التوصيات", icon: TrendingUp },
   { href: "/admin/trial-requests", label: "طلبات التجربة المجانية", icon: UserPlus },
